@@ -1,0 +1,127 @@
+# backend/api/core/auth.py
+import logging
+from datetime import datetime, timedelta
+from typing import Optional
+
+from jose import jwt, JWTError
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
+from passlib.context import CryptContext
+
+from backend.api.models.user import User
+from backend.api.deps.database import get_db
+from backend.api.repositories.user_repository import UserRepository
+from backend.api.core.config import get_settings
+
+# -------------------------------------------------
+# Logging
+# -------------------------------------------------
+logger = logging.getLogger("robotsystem.auth")
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
+    logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
+# -------------------------------------------------
+# Configurações
+# -------------------------------------------------
+settings = get_settings()
+PEPPER = getattr(settings, "PEPPER", "")
+
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+REFRESH_TOKEN_EXPIRE_DAYS = 7
+ALGORITHM = "HS256"
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/login")
+repo = UserRepository()
+
+# -------------------------------------------------
+# Passlib
+# -------------------------------------------------
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+)
+
+# -------------------
+# Hash de senha
+# -------------------
+def hash_password(password: str) -> str:
+    """
+    Gera hash seguro da senha usando bcrypt + pepper
+    """
+    pwd_peppered = password + PEPPER
+    return pwd_context.hash(pwd_peppered)
+
+
+def verify_password(password: str, hashed: str) -> bool:
+    """
+    Verifica senha usando bcrypt + pepper
+    """
+    pwd_peppered = password + PEPPER
+    return pwd_context.verify(pwd_peppered, hashed)
+
+# -------------------
+# JWT tokens
+# -------------------
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (
+        expires_delta
+        if expires_delta
+        else timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+
+
+def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (
+        expires_delta
+        if expires_delta
+        else timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    )
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+
+
+def decode_access_token(token: str) -> Optional[dict]:
+    try:
+        return jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError:
+        return None
+
+
+def decode_refresh_token(token: str) -> Optional[dict]:
+    try:
+        return jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError:
+        return None
+
+# -------------------
+# Dependency FastAPI
+# -------------------
+def get_current_user(
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
+) -> User:
+    payload = decode_access_token(token)
+    if not payload or "sub" not in payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido",
+        )
+
+    user_id = int(payload["sub"])
+    user = repo.get(db, user_id)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Usuário não encontrado",
+        )
+
+    return user

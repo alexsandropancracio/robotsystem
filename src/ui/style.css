@@ -1,0 +1,2044 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Comportamento SPA base */
+.view {
+    display: none;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.view.active {
+    display: flex; /* muitas telas são flex, mas isso podemos ajustar por tela */
+    overflow: hidden; /* bloqueia scroll geral */
+}
+
+
+header,
+header * {
+  position: relative;   /* mantém o fluxo normal, mas permite z-index funcionar */
+  z-index: 9999;        /* bem alto para sobrepor overlays */
+}
+
+/* Background geral */
+body, html {
+    background-color: #050505;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+button.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+    position: relative;
+}
+
+button.loading::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border: 3px solid #ffffff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+
+/* =======================
+  HEADER
+======================= */
+.container,
+.content,
+.wrapper {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+header .hidden, header nav, header a, header button {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    position: sticky;
+    top: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 100;
+}
+
+.header .logo {
+    font-size: 1.6rem;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: lowercase;
+    letter-spacing: -0.02em;
+    color: #fff;
+}
+
+.header nav {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem; /* aumenta espaçamento entre links */
+}
+
+.header nav a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    position: relative;
+
+    display: inline-block;
+    transition: color .25s ease, transform .25s ease;
+}
+
+.header nav a:hover {
+    color: #fff;
+}
+
+.header nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: #fff;
+    transition: width .3s ease;
+}
+
+.header nav a:hover::after {
+    width: 100%; /* cobre apenas o texto */
+}
+
+.header nav button {
+    background: rgb(255, 255, 255);
+    padding: 0.65rem 1.2rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #000000;
+    cursor: pointer;
+    transition: background .25s ease, transform .2s ease, box-shadow .3s ease;
+}
+
+.header nav button:hover {
+    background: rgba(255,255,255,0.95);
+    transform: scale(1.03);
+}
+
+
+#login .login-wrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 120px;
+    gap: 25px;
+    transform: translateY(-40px);
+    z-index: 9999;
+}
+
+/* Logo */
+#login .login-logo {
+    margin-bottom: 10px;
+}
+
+#login .login-logo h2.logo-text {
+    font-size: 50px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+}
+
+/* Card */
+#login .login-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 12px;
+    padding: 35px;
+    width: 420px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+/* Form */
+#login .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Labels */
+#login .label {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Inputs */
+#login .input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: white;
+    font-size: 1rem;
+}
+
+#login .input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Botões */
+#login .login-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+#login .btn-login,
+#login .btn-cadastrar {
+    flex: 1;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+#login .btn-login {
+    background: white;
+    color: black;
+}
+
+#login .btn-login:hover {
+    background: rgba(255,255,255,0.85);
+}
+
+#login .btn-cadastrar {
+    background: rgba(255,255,255,0.10);
+    color: white;
+}
+
+#login .btn-cadastrar:hover {
+    background: rgba(255,255,255,0.20);
+}
+
+/* Checkbox */
+#login .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 0.95rem;
+    margin-top: 5px;
+}
+
+#login .checkbox-label input {
+    width: 16px;
+    height: 16px;
+}
+
+/* "Esqueceu sua senha?" */
+#login .link.forgot-password {
+    margin-top: 5px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    text-decoration: underline;
+    cursor: pointer;
+    width: 40%;
+}
+
+#login .link.forgot-password:hover {
+    color: white;
+}
+
+/* foco visual principal — borda branca + leve brilho */
+#login .input:focus {
+    border-color: rgba(255,255,255,1);
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+/* foco acessível (mostra quando o usuário navega por teclado) */
+#login .input:focus-visible {
+    border-color: rgba(255,255,255,1);
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+/* transição suave */
+#login .input {
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    outline: none;
+}
+
+#cadastro .cadastro-wrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 120px;
+    gap: 25px;
+    transform: translateY(-90px);
+    z-index: 9998;
+}
+
+/* Logo */
+#cadastro .cadastro-logo {
+    margin-bottom: 10px;
+}
+
+#cadastro .logo-text {
+    font-size: 50px;
+    text-align: center;
+    color: white;
+}
+
+#cadastro .cadastro-logo h2.logo-text {
+    font-size: 50px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+}
+
+/* CARD */
+#cadastro .cadastro-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 12px;
+    padding: 35px;
+    width: 420px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+/* Form */
+#cadastro .cadastro-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Labels -> agora com .label */
+#cadastro .label {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Inputs -> agora com .input */
+#cadastro .input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: white;
+    font-size: 1rem;
+}
+
+#cadastro .input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Botões */
+#cadastro .cadastro-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+#cadastro .btn-cadastrar,
+#cadastro .btn-cancelar {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+#cadastro .btn-cadastrar {
+    background: white;
+    color: black;
+}
+
+#cadastro .btn-cadastrar:hover {
+    background: rgba(255,255,255,0.85);
+}
+
+#cadastro .btn-cancelar {
+    background: rgba(255,255,255,0.10);
+    color: white;
+}
+
+#cadastro .btn-cancelar:hover {
+    background: rgba(255,255,255,0.20);
+}
+
+/* Input transitions */
+#cadastro .input {
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    outline: none;
+}
+
+#cadastro .input:focus,
+#cadastro .input:focus-visible {
+    border-color: rgba(255,255,255,1);
+    box-shadow: 0 0 0 5px rgba(255,255,255,0.1);
+}
+
+#token .gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.05), transparent 70%);
+}
+
+/* Token padrão oculto como as outras views */
+#token .view {
+    display: none;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    background-color: #000;
+    justify-content: center;
+    align-items: center;
+    padding-top: 120px;
+}
+
+/* Visível SOMENTE quando .active */
+#token .view.active {
+    display: flex;
+}
+
+/* CARD */
+#token .token-wrapper {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 12px;
+    padding: 35px;
+    width: 420px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+/* Título */
+#token .title {
+    font-size: 20px;
+    text-align: center;
+    color: white;
+    margin-bottom: 10px;
+}
+
+/* Label padrão (igual cadastro/login) */
+#token .label {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    align-self: center;
+}
+
+/* Input (igual estrutura global dos forms) */
+#token #token-codigo {
+    width: 40%;
+    padding: 10px 14px;
+    font-size: 1rem;
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 8px;
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    outline: none;
+}
+
+#token #token-codigo::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+#token #token-codigo:focus,
+#token #token-codigo:focus-visible {
+    border-color: rgba(255,255,255,1);
+    box-shadow: 0 0 0 5px rgba(255,255,255,0.1);
+}
+
+/* Botões */
+#token .token-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Botões padrão */
+#token .token-buttons .button {
+    flex: 1;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+/* Confirmar Token */
+#token .button[data-action="confirmar-token"] {
+    background: white;
+    color: black;
+}
+
+#token .button[data-action="confirmar-token"]:hover {
+    background: rgba(255,255,255,0.85);
+}
+
+/* Voltar Login */
+#token .button[data-action="voltar-login"] {
+    background: rgba(255,255,255,0.10);
+    color: white;
+}
+
+#token .button[data-action="voltar-login"]:hover {
+    background: rgba(255,255,255,0.20);
+}
+
+/* Mensagens de feedback */
+#token .msg-token {
+    margin-top: 15px;
+    font-size: 0.95rem;
+    color: #e53935;
+    text-align: center;
+}
+
+#token .msg-token.sucesso {
+    color: #4caf50;
+}
+
+#interface .view.active {
+  width: 100%;
+  height: 100vh;
+  background-color: #050505;
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+  display: none; /* só aparece quando tiver .active */
+}
+
+#interface .view {
+  display: block;
+}
+
+#interface .container {
+  width: 100%;
+  max-width: 1500px;     /* ou 1600px, explico abaixo */
+  height: 100%;
+  margin: 0 auto;        /* agora funciona */
+  padding: 0 2rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+#interface .background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: #050505;
+    z-index: 0;
+}
+
+#interface .content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#interface .wrapper {
+    width: 100%;
+    padding-top: 1rem;
+}
+
+/* =======================
+   GRID E TEXTO
+======================= */
+#interface .main-section {
+    margin-top: 2rem;
+    transform: translateY(50px);
+}
+
+#interface .grid {
+    display: grid;
+    gap: 3rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width:1024px) {
+    #interface .grid {
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+    }
+}
+
+#interface .text-block h1 {
+    font-size: 2.75rem;
+    line-height: 1.2;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+}
+
+@media (min-width:768px) {
+    #interface .text-block h1 {
+        font-size: 3.5rem;
+    }
+}
+
+#interface .text-block p {
+    color: rgba(255,255,255,0.7);
+    font-size: 1rem;
+    max-width: 480px;
+    line-height: 1.6;
+}
+
+/* =======================
+   VISUAL BLOCK / CIRCLES
+======================= */
+#interface .visual-block {
+    transform: translateY(50px);
+    position: relative;
+    min-height: 40vh; /* responsivo */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#interface .circles {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+#interface .circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+#interface .circle.large {
+    width: 30vw;
+    height: 30vw;
+}
+
+#interface .circle.medium {
+    width: 20vw;
+    height: 20vw;
+}
+
+#interface .circle.small {
+    width: 10vw;
+    height: 10vw;
+}
+
+/* =======================
+   DASHBOARD CARD
+======================= */
+#interface .dashboard-card {
+    width: 90%;
+    max-width: 540px;
+    height: auto;
+    padding: 22px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(16px);
+    z-index: 9998;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 0 25px rgba(255,255,255,0.08);
+}
+
+#interface .dashboard-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+#interface .status-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgb(255, 255, 255)
+}
+
+#interface .status-left p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgb(255, 255, 255);
+    z-index: 9999;
+}
+
+#interface .status-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(76, 175, 80, 0.7);
+    animation: pulseGreen 1.3s ease-in-out infinite;
+}
+
+@keyframes pulseGreen {
+    0% { transform: scale(1); box-shadow: 0 0 6px rgba(76, 175, 80, 0.702); }
+    50% { transform: scale(1.3); box-shadow: 0 0 10px rgba(76,175,80,1); }
+    100% { transform: scale(1); box-shadow: 0 0 6px rgba(76,175,80,0.7); }
+}
+
+#interface .dashboard-card .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#interface .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    transform: translateY(-15px);
+}
+
+#interface .progress-info .completed {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+#interface .dashboard-card .divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 0.75rem 0;
+}
+
+#interface .dashboard-card .card-body p {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+#interface .dashboard-card .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+#interface .dashboard-card .progress-fill {
+    width: 100%;
+    height: 100%;
+    background: #4caf50;
+}
+/* ===========================
+   SECTION: FUNCIONALIDADES
+=========================== */
+
+/* ===== BASE DA SECTION ===== */
+#funcionalidades .view {
+  
+  min-height: 100vh;
+  background: #050505;
+  color: #fff;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* ===== CONTAINER GERAL ===== */
+#funcionalidades .funcionalidades-container {
+  width: 100%;
+  margin: 0 auto;         /* 🔥 centraliza tudo */
+  padding: 0 1.5rem;      /* 🔥 respiro lateral */
+  box-sizing: border-box;
+}
+
+/* ===== MAIN CONTENT ===== */
+#funcionalidades .main-content {
+  padding-top: 3rem;
+  padding-bottom: 4rem;
+  width: 100%;
+  transform: translateY(30px);
+}
+
+/* ===== TITULOS ===== */
+#funcionalidades .section-header {
+  text-align: center;
+  max-width: 750px;
+  margin: 0 auto 3rem;
+}
+
+#funcionalidades .section-header h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+/* ===== GRID DOS CARDS ===== */
+#funcionalidades .cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  width: 100%;
+  padding: 0 1.2rem;
+  margin: 0 auto;
+}
+@media (min-width: 640px) {
+  #funcionalidades .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  #funcionalidades .cards-grid {
+    grid-template-columns: repeat(3, minmax(320px, 1fr));
+    gap: 2.5rem;
+  }
+}
+
+
+/* ===== CARD ===== */
+#funcionalidades .card {
+  background: rgba(255,255,255,0.04);
+  padding: 2rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: transform .25s ease, box-shadow .25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 300px; /* 📌 maior como pediu */
+  justify-content: flex-start;
+}
+
+#funcionalidades .card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 0 24px rgba(255,255,255,0.10);
+}
+
+/* ===== HEADER DO CARD ===== */
+#funcionalidades .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Ícone + texto lado a lado */
+#funcionalidades .status-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#funcionalidades .status-left p {
+  font-size: 1.0rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+#funcionalidades .status-left span {
+  font-size: 1.50rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ======== CARD BODY ======== */
+#funcionalidades .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 0;
+}
+
+/* Primeiro parágrafo (título interno) */
+#funcionalidades .card-body p:first-child {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+/* Texto descritivo */
+#funcionalidades .card-body p:nth-child(2) {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.4rem;
+}
+
+/* O BODY do card ocupa o espaço, empurrando o footer pra baixo */
+#funcionalidades .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+}
+
+/* ======== FOOTER DO CARD ======== */
+#funcionalidades .card-body .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto; /* empurra para o final */
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Texto do rodapé */
+#funcionalidades .card-body .card-footer span {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+}
+
+/* Botão "Automatizar" */
+#funcionalidades .btn-automatizar {
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: rgb(255, 255, 255);
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    color: #000000;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+#funcionalidades .btn-automatizar:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: scale(1.03);
+}
+
+/* =======================
+   VIEW PRINCIPAL
+======================= */
+#contato .view {
+    display: block;
+}
+
+#contato .view.active {
+    width: 100%;
+    height: 100vh; /* garante ocupar toda a altura da tela */
+    display: flex;
+    flex-direction: column;
+    background: #050505; /* uniforme com outras views */
+    color: #fff;
+    overflow: hidden; /* evita scroll indesejado */
+}
+
+/* =======================
+   CONTAINER PRINCIPAL
+======================= */
+#contato .contato-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =======================
+   MAIN WRAPPER
+======================= */
+#contato .contato-main-wrapper {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+#contato .contato-main {
+    display: flex;
+    gap: 60px;
+    align-items: flex-start; /* alinha topo dos cards */
+    justify-content: center;
+    width: 100%;
+    max-width: 1100px;
+    flex-wrap: wrap; /* evita overflow em telas pequenas */
+}
+
+/* =======================
+   CARD DO FORMULÁRIO
+======================= */
+#contato .card-contato {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    padding: 28px;
+    width: 420px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.08);
+    box-sizing: border-box;
+    flex-shrink: 0; /* não encolhe */
+}
+
+#contato .form-contato {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+#contato .titulo-form {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+/* Inputs */
+#contato input,
+#contato textarea {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 1rem;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+#contato textarea { 
+    height: 120px; 
+    resize: none; 
+}
+
+#contato input::placeholder,
+#contato textarea::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+#contato input:focus,
+#contato textarea:focus {
+    outline: none;
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+}
+
+#contato .btn-contato {
+    margin-top: 6px;
+    background: #fff;
+    color: #000;
+    border-radius: 10px;
+    padding: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+    width: fit-content;
+}
+
+#contato .btn-contato:hover {
+    background: rgba(255,255,255,0.9);
+    transform: translateY(-1px);
+}
+
+/* =======================
+   COLUNA DIREITA
+======================= */
+#contato .contato-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 260px;
+}
+
+#contato .contato-title {
+    font-size: 50px;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    line-height: 1.05;
+}
+
+#contato .contato-sub {
+    color: rgba(255,255,255,0.72);
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+    max-width: 420px;
+}
+
+#contato .contato-info {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+#contato .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#contato .icon {
+    font-size: 30px;
+    color: rgba(255,255,255,0.9);
+}
+
+#contato .info-title {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.65);
+}
+
+#contato .info-value {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* =======================
+   FOCO SUAVE
+======================= */
+#contato .input-contato,
+#contato .textarea-contato {
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    outline: none;
+}
+
+#contato .input-contato:focus,
+#contato .textarea-contato:focus {
+    border-color: rgba(255,255,255,1);
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+#contato .input-contato:focus-visible,
+#contato .textarea-contato:focus-visible {
+    border-color: rgba(255,255,255,1);
+    box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+/* =======================
+   RESPONSIVIDADE
+======================= */
+@media (max-width: 1024px) {
+    #contato .contato-main { gap: 40px; }
+    #contato .contato-title { font-size: 40px; }
+}
+
+@media (max-width: 820px) {
+    #contato .contato-main {
+        flex-direction: column;
+        text-align: center;
+        gap: 30px;
+    }
+
+    #contato .card-contato,
+    #contato .contato-right {
+        width: 92%;
+        max-width: 520px;
+    }
+
+    #contato .contato-info {
+        text-align: center;
+        align-items: center;
+    }
+
+    #contato .contato-title { font-size: 36px; }
+}
+
+/* =======================
+   SECTION XML CONVERTER
+======================= */
+#xml_converter {
+    display: none; /* padrão SPA */
+    width: 100%;
+    height: calc(100vh - 70px); /* descontando header */
+    overflow: hidden;
+    position: relative;
+    background-color: #050505;
+    color: #fff;
+    flex-direction: column;
+}
+
+#xml_converter.active {
+    display: flex; /* agora funciona corretamente */
+}
+
+/* Container central */
+#xml_converter .xml-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    padding: 2rem;
+}
+
+/* Main content */
+#xml_converter .xml-main {
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+}
+
+/* Centro do conteúdo */
+#xml_converter .xml-center {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+/* Título e subtítulo */
+#xml_converter .xml-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+#xml_converter .xml-sub {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.7);
+    max-width: 600px;
+    text-align: center;
+}
+
+/* Wrapper do card e rings */
+#xml_converter .card-wrapper-xml {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Rings decorativos */
+#xml_converter .rings-container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+#xml_converter .ring {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    position: absolute;
+    animation: spinRing 20s linear infinite;
+}
+
+#xml_converter .ring-1 { width: 350px; height: 350px; }
+#xml_converter .ring-2 { width: 400px; height: 400px; }
+#xml_converter .ring-3 { width: 550px; height: 550px; }
+
+/* Card principal */
+#xml_converter .card-xml {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    z-index: 10;
+}
+
+/* Card header */
+#xml_converter .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#xml_converter .status-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#xml_converter .status-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+#xml_converter .status-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(76,175,80,0.7);
+    animation: pulseGreen 1.3s ease-in-out infinite;
+}
+
+/* Divider */
+#xml_converter .divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+}
+
+/* Card content */
+#xml_converter .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Rows de input e botão */
+#xml_converter .row {
+    display: flex;
+    width: 100%;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#xml_converter .input-path {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+#xml_converter .btn-select {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+#xml_converter .btn-select:hover {
+    background: rgba(255,255,255,0.16);
+    transform: translateY(-1px);
+}
+
+/* Botão Converter */
+#xml_converter .actions-row {
+    display: flex;
+    justify-content: center;
+}
+
+#xml_converter .btn-convert {
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    border: none;
+    background: #ffffff;
+    color: #000000;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+#xml_converter .btn-convert:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Formato de saída */
+
+#xml_converter .position-action {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+}
+
+#xml_converter .format-filter {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+#xml_converter .select-doc {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+}
+
+/* Barra de progresso */
+#xml_converter .progress-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+#xml_converter .xml-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+#xml_converter .progress-fill-xml {
+    width: 0%;
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.3s ease;
+}
+
+#xml_converter .progress-info {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+}
+
+/* =======================
+   RESPONSIVO
+======================= */
+@media (min-width:768px) {
+    #xml_converter .xml-title {
+        font-size: 1.5rem;
+    }
+    #xml_converter .card-xml {
+        padding: 2.5rem;
+    }
+}
+
+@media (min-width:1024px) {
+    #xml_converter .row {
+        gap: 1rem;
+    }
+}
+
+/* =======================
+   ANIMAÇÃO PULSAR
+======================= */
+@keyframes pulseGreen {
+    0% { transform: scale(1); box-shadow: 0 0 6px rgba(76,175,80,0.7); }
+    50% { transform: scale(1.3); box-shadow: 0 0 10px rgba(76,175,80,1); }
+    100% { transform: scale(1); box-shadow: 0 0 6px rgba(76,175,80,0.7); }
+}
+
+/* =======================
+   SECTION RENAME FILES
+======================= */
+#rename {
+    display: none; /* padrão SPA */
+    width: 100%;
+    height: calc(100vh - 70px); /* descontando header */
+    overflow: hidden;
+    position: relative;
+    background-color: #050505;
+    color: #fff;
+    flex-direction: column;
+}
+
+#rename.active {
+    display: flex; /* aparece quando navegado */
+}
+
+/* Container central */
+#rename .rename-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    padding: 2rem;
+}
+
+/* Main content */
+#rename .rename-main {
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+}
+
+/* Centro do conteúdo */
+#rename .rename-center {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+/* Título e subtítulo */
+#rename .rename-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+#rename .rename-center p {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.7);
+    max-width: 600px;
+    text-align: center;
+}
+
+/* Wrapper do card e rings */
+#rename .card-wrapper-rename {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Rings decorativos */
+#rename .rings-container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+#rename .ring {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    position: absolute;
+    animation: spinRing 20s linear infinite;
+}
+
+#rename .ring-1 { width: 350px; height: 350px; }
+#rename .ring-2 { width: 400px; height: 400px; }
+#rename .ring-3 { width: 550px; height: 550px; }
+
+/* Card principal */
+#rename .card-rename {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    z-index: 10;
+}
+
+/* Card header */
+#rename .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#rename .status-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#rename .status-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgb(255, 255, 255);
+}
+
+#rename .status-text {
+    color: #ffffff !important;
+}
+
+#rename .status-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(76,175,80,0.7);
+    animation: pulseGreen 1.3s ease-in-out infinite;
+}
+
+/* Divider */
+#rename .divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+}
+
+/* Card content */
+#rename .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Rows: input + botões */
+#rename .row {
+    display: flex;
+    width: 100%;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#rename .input-path {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+#rename .btn-select {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+#rename .btn-select:hover {
+    background: rgba(255,255,255,0.16);
+    transform: translateY(-1px);
+}
+
+/* Botão Converter */
+#rename .actions-row {
+    display: flex;
+    justify-content: center;
+}
+
+#rename .btn-convert {
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    border: none;
+    background: #ffffff;
+    color: #000000;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+#rename .btn-convert:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Dropdown de filtros */
+
+#rename .position-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+
+#rename .format-filter {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+#rename .select-doc {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+}
+
+/* Barra de progresso */
+#rename .progress-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+#rename .rename-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+#rename .progress-fill-rename {
+    width: 0%;
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.3s ease;
+}
+
+#rename .progress-info {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+}
+
+/* =======================
+   RESPONSIVO
+======================= */
+@media (min-width:768px) {
+    #rename .rename-title {
+        font-size: 1.5rem;
+    }
+    #rename .card-rename {
+        padding: 2.5rem;
+    }
+}
+
+@media (min-width:1024px) {
+    #rename .row {
+        gap: 1rem;
+    }
+}
+
+/* =======================
+   ANIMAÇÃO STATUS
+======================= */
+@keyframes pulseGreen {
+    0% { transform: scale(1); box-shadow: 0 0 6px rgba(76,175,80,0.7); }
+    50% { transform: scale(1.3); box-shadow: 0 0 10px rgba(76,175,80,1); }
+    100% { transform: scale(1); box-shadow: 0 0 6px rgba(76,175,80,0.7); }
+}
+
+/* ==========================================================
+   SECTION: SEPARATOR (SPA VIEW)
+   ========================================================== */
+
+#separator.view {
+    display: none;
+    width: 100%;
+    height: calc(100vh - 70px); /* compatível com o header fixo */
+    background: #050505;
+    color: #fff;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+#separator.view.active {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+}
+
+
+/* ==========================================================
+   LAYOUT WRAPPERS
+   ========================================================== */
+
+#separator .separator-wrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#separator .separator-main {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#separator .separator-center {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+
+/* ==========================================================
+   TITULOS / TEXTOS
+   ========================================================== */
+
+#separator .separator-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    color: #fff;
+}
+
+#separator .separator-sub {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    max-width: 600px;
+}
+
+
+/* ==========================================================
+   CARD PRINCIPAL
+   ========================================================== */
+
+/* Rings decorativos */
+#separator .rings-container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+#separator .ring {
+
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    position: absolute;
+    justify-content: center;
+}
+
+#separator .ring-1 { width: 300px; height: 300px; }
+#separator .ring-2 { width: 400px; height: 400px; }
+#separator .ring-3 { width: 550px; height: 550px; }
+
+#separator .card-wrapper-separator {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+#separator .card-separator {
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 2rem;
+    max-width: 650px;
+    max-height: 400px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 0 25px rgba(255,255,255,0.08);
+    position: relative;
+    z-index: 10;
+}
+
+
+/* ==========================================================
+   HEADER DO CARD / STATUS
+   ========================================================== */
+
+#separator .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#separator .status-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#separator .status-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff !important;
+}
+
+#separator .status-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    animation: pulseGreen 1.3s ease-in-out infinite;
+}
+
+@keyframes pulseGreen {
+    0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); }
+    100% { box-shadow: 0 0 8px 3px rgba(76,175,80,0.15); }
+}
+
+#separator .divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+}
+
+
+/* ==========================================================
+   INPUTS / PATH ROWS
+   ========================================================== */
+
+#separator .row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+
+}
+
+#separator .input-path {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+#separator .input-path::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+#separator .btn-select {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+#separator .btn-select:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+
+/* ==========================================================
+   BOTÃO CONFIRMAR
+   ========================================================== */
+
+#separator .actions-row {
+    width: 100%;
+    padding-bottom: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+#separator .btn-convert {
+    padding: 0.8rem 1.4rem;
+    border-radius: 10px;
+    border: none;
+    background: #ffffff;
+    color: #000000;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+#separator .btn-convert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 12px rgba(255,255,255,0.3);
+}
+
+
+/* ==========================================================
+   BARRA DE PROGRESSO
+   ========================================================== */
+
+#separator .progress-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    align-items: center;
+}
+
+#separator .sep-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+#separator .progress-fill-separator {
+    width: 0%;
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.25s ease;
+}
+
+#separator .progress-info {
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: end;
+    width: 100%;
+    color: rgba(255,255,255,0.75);
+}
+

@@ -1,0 +1,179 @@
+Relatório de Desenvolvimento – 07/12/2025
+
+Projeto: SPA Python + PyWebView – Separação de PDFs e Conversão XML
+Responsável: Alex
+
+1. Objetivo do Dia
+
+Corrigir e finalizar a barra de progresso da funcionalidade de separação de PDFs por termos (Separator).
+
+Garantir que:
+
+A barra se mova corretamente conforme o progresso.
+
+O percentual acompanhe o progresso.
+
+Não haja interferência com a barra do XML.
+
+A interface continue responsiva.
+
+2. Problemas Identificados
+
+Progress bar não se mexia
+
+O callback de Python chamando JS estava funcionando, mas o progresso visual não atualizava.
+
+Inicialmente, a mesma classe .progress-fill era usada para XML e Separator, causando conflito.
+
+Reset da barra
+
+O reset das barras não funcionava ao trocar de página ou após finalizar a função.
+
+Tentativas de usar delay no reset acabaram resetando imediatamente ao exibir alert().
+
+Interferência de classes
+
+As seções #xml_converter e #progress-separator tinham elementos com a mesma classe .progress-fill.
+
+Isso fazia com que a barra errada fosse atualizada.
+
+3. Soluções Implementadas
+3.1 Separação de classes CSS
+
+Criamos uma classe específica para o Separator:
+
+.progress-fill-separator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  background: #fff;
+  transform-origin: left center;
+  transition: width 400ms linear;
+  box-shadow: 0 0 12px rgba(255,255,255,0.08) inset;
+}
+#separator .progress-fill-separator.complete {
+  box-shadow: 0 0 18px rgba(255,255,255,0.14) inset;
+}
+
+
+Mantivemos .progress-fill apenas para XML, evitando interferência.
+
+3.2 Callback JS de atualização
+
+A função window.atualizarProgressoSeparator foi ajustada para selecionar corretamente a classe do Separator:
+
+window.atualizarProgressoSeparator = window.atualizarProgressoSeparator || function(pct) {
+    const interval = setInterval(() => {
+        const progressFill = document.querySelector("#progress-separator .progress-fill-separator");
+        const progressPercent = document.querySelector("#progress-separator .progress-info .progress-percent");
+
+        if (progressFill && progressPercent) {
+            progressFill.style.width = pct + "%";
+            progressPercent.textContent = pct + "%";
+            console.log("[DEBUG] Separator atualizado para:", pct + "%");
+            clearInterval(interval);
+        }
+    }, 50);
+};
+
+
+Garantimos que o JS só atualize a barra específica do Separator, sem interferir na barra do XML.
+
+3.3 Callback Python para JS
+
+Ajustamos a função Python atualizar_progresso_separator para chamar corretamente o JS via PyWebView:
+
+def atualizar_progresso_separator(self, pct: int, _tentativa: int = 0):
+    try:
+        self.window.evaluate_js(f"window.atualizarProgressoSeparator({int(pct)});")
+        return True
+    except Exception as e:
+        if _tentativa < 5:
+            delay = 0.05 * (2 ** _tentativa)
+            threading.Timer(delay, lambda: self.atualizar_progresso_separator(pct, _tentativa + 1)).start()
+            return False
+        print("[ERRO] Falha definitiva ao enviar progresso Separator para o JS:", e)
+        return False
+
+
+Isso permitiu comunicação confiável entre Python e JS, mesmo que a DOM ainda não estivesse totalmente carregada.
+
+3.4 Função de reset das barras
+
+Criamos resetProgressBars() que reseta tanto XML quanto Separator:
+
+function resetProgressBars() {
+    document.querySelectorAll(".progress-fill").forEach(bar => bar.style.width = "0%");
+    document.querySelectorAll(".progress-fill-separator").forEach(bar => bar.style.width = "0%");
+    document.querySelectorAll(".progress-percent").forEach(text => text.textContent = "0%");
+    console.log("[DEBUG] Todas as barras de progresso resetadas");
+}
+
+
+Chamamos essa função ao trocar de página SPA para evitar interferência visual.
+
+Observação: Delay no reset após a finalização de processos foi descartado para evitar bugs com alert().
+
+3.5 Ajustes nas funções de clique dos botões
+
+Botão XML:
+
+btnConvert.addEventListener("click", () => {
+    resetProgressBars();
+    window.pywebview.api.converter_xml(src, tgt, fmt)
+        .then(...)
+        .catch(...);
+});
+
+
+Botão Separator:
+
+btnConvertFunc.addEventListener("click", () => {
+    window.pywebview.api.separar_documentos_por_termos(src, tgt, termos)
+        .then(result => {
+            console.log("[PYTHON OK] Separação finalizada:", result);
+            alert("Separação concluída!");
+        })
+        .catch(err => {...});
+});
+
+
+O reset agora é chamado somente na troca de página, não após o alert().
+
+3.6 Thread de separação Python
+
+Ajustamos separar_documentos_por_termos para usar callback progressivo via thread:
+
+def separar_documentos_por_termos(self, pasta_entrada, pasta_saida, termos):
+    def atualizar_barra_separator(pct):
+        self.atualizar_progresso_separator(pct)
+
+    self.thread = ThreadSeparar(
+        tarefa_pdf,
+        pasta_entrada,
+        pasta_saida,
+        termos,
+        signal_progresso=atualizar_barra_separator
+    )
+    self.thread.start()
+
+
+O progresso do Python agora é enviado continuamente para o JS, garantindo feedback visual em tempo real.
+
+4. Status Atual
+
+✅ Funcionalidade do Separator funcionando corretamente
+✅ Barra de progresso acompanha o percentual
+✅ Barra do XML não interfere no Separator
+✅ Reset das barras funciona ao trocar de página
+⚠ Reset após alert() foi descartado para evitar bugs visuais
+
+5. Próximos Passos
+
+Refinar visual do reset das barras, possivelmente com delay apenas na navegação.
+
+Ajustar estética das barras para quando finalizarem o 100%.
+
+Consolidar funções JS de progress para evitar repetição de código.

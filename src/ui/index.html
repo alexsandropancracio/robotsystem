@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RoboSystem SPA</title>
+
+    <!-- Fonts externas (Google Fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <!-- CSS customizado -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Fontes locais (fallback ou offline) -->
+    <style>
+        @font-face {
+            font-family: 'Space Grotesk';
+            src: url('assets/fonts/SpaceGrotesk-Regular.ttf') format('truetype');
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: 'Roboto';
+            src: url('assets/fonts/Roboto-Regular.ttf') format('truetype');
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: 'Material Symbols Outlined';
+            src: url('assets/fonts/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN VIEW -->
+    <section id="login" class="view">
+        <div class="background">
+                <div class="gradient-overlay"></div>
+            </div>
+
+        <main class="login-wrapper">
+            <div class="login-logo">
+                <h2 class="logo-text">robotsystem</h2>
+            </div>
+
+            <div class="login-card">
+                <form class="login-form">
+                    <label for="login-email" class="label">E-mail</label>
+                    <input type="email" id="login-email" class="input" placeholder="Seu e-mail">
+
+                    <label for="login-senha" class="label">Senha</label>
+                    <input type="password" id="login-senha" class="input" placeholder="Sua senha">
+
+                    <div class="login-buttons">
+                        <button type="button" class="button btn-login" data-action="login">Entrar</button>
+                        <button type="button" class="button btn-cadastrar" data-nav="cadastro">Cadastrar</button>
+                    </div>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="lembrar-senha"> Lembrar senha
+                    </label>
+
+                    <a href="#" class="link forgot-password">Esqueceu sua senha?</a>
+                </form>
+            </div>
+        </main>
+    </section>
+
+    <!-- CADASTRO VIEW -->
+    <section id="cadastro" class="view">
+        <div class="background">
+                <div class="gradient-overlay"></div>
+            </div>
+        <main class="cadastro-wrapper">
+            <div class="cadastro-logo">
+                <h2 class="logo-text">robotsystem</h2>
+            </div>
+
+            <div class="cadastro-card">
+                <form class="cadastro-form">
+                    <label for="cadastro-nome" class="label">Nome completo</label>
+                    <input type="text" id="cadastro-nome" class="input" placeholder="Seu nome completo">
+
+                    <label for="cadastro-email" class="label">E-mail</label>
+                    <input type="email" id="cadastro-email" class="input" placeholder="Seu e-mail">
+
+                    <label for="cadastro-senha" class="label">Senha</label>
+                    <input type="password" id="cadastro-senha" class="input" placeholder="Sua senha">
+
+                    <label for="cadastro-repetir" class="label">Repetir senha</label>
+                    <input type="password" id="cadastro-repetir" class="input" placeholder="Repita a senha">
+
+                    <div class="cadastro-buttons">
+                        <button type="button" class="button btn-cadastrar" data-action="confirmar-cadastro">Cadastrar</button>
+                        <button type="button" class="button btn-cancelar" data-nav="login">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </section>
+
+    <section id="token" class="view">
+        <div class="background">
+                <div class="gradient-overlay"></div>
+            </div>
+        <main class="token-wrapper">
+            <h2 class="title">Confirmação de Token</h2>
+
+            <label for="token-codigo" class="label">Digite o token (enviado para seu e-mail)</label>
+            <input id="token-codigo" type="text" class="input" placeholder="Ex.: 123456" />
+
+            <div class="token-buttons">
+                <button type="button" class="button" data-action="confirmar-token">Confirmar</button>
+                <button type="button" class="button" data-action="voltar-login">Cancelar</button>
+            </div>
+        </main>
+    </section>
+
+    <header class="header">
+        <div class="header-left">
+            <h2 class="logo" data-nav="interface">robotsystem</h2>
+        </div>
+        <div class="header-right">
+            <nav>
+                <a href="#" data-nav="funcionalidades">Funcionalidades</a>
+                <a href="#" data-nav="contato">Contato</a>
+                <button data-action="logout">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <section id="interface" class="view active">
+        <div class="container">
+            <div class="content">
+                <div class="wrapper">
+
+                    <main class="main-section">
+                        <div class="grid">
+                            <div class="text-block">
+                                <h1>Automação que funciona para você, enquanto você foca no que importa.</h1>
+                                <p>Transforme a burocracia manual em segundos de precisão. Automatizamos seu manuseio de documentos, relatórios e processamento de dados.</p>
+                            </div>
+
+                            <div class="visual-block">
+                                <div class="circles">
+                                    <div class="circle large"></div>
+                                    <div class="circle medium"></div>
+                                    <div class="circle small"></div>
+                                </div>
+
+                                <div class="dashboard-card" data-alt="A stylized, glassmorphism-style dashboard visual showing a completed task.">
+                                    <div class="card-header">
+                                        <div class="status-left">
+                                            <span class="material-symbols-outlined">sync</span>
+                                            <p>AUTOMAÇÃO EM EXECUÇÃO</p>
+                                        </div>
+                                        <div class="status-dot"></div>
+                                    </div>
+
+                                    <div class="divider"></div>
+
+                                    <div class="card-body">
+                                        <p>Tarefa: Processamento de XML...</p>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill"></div>
+                                        </div>
+                                        <div class="progress-info">
+                                            <span>Processando Lote #724</span>
+                                            <span class="completed">100%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="funcionalidades" class="view">
+        <div class="funcionalidades-container">
+            <!-- Header -->
+            <div class="content">
+                <div class="wrapper">
+                    <main class="main-content">
+                        <div class="section-header">
+                            <h1>Funcionalidades Principais</h1>
+                            <p>Descubra como o robotsystem pode transformar suas operações diárias, economizando tempo e eliminando erros com nossa automação inteligente.</p>
+                        </div>
+
+                        <!-- Grid de Cards -->
+                        <div class="cards-grid">
+                            
+                            <!-- Card 1 -->
+                            <div class="card glow-effect">
+                                <div class="card-header">
+                                    <div class="status-left">
+                                        <span class="material-symbols-outlined">description</span>
+                                        <p>LEITURA E CONVERSÃO</p>
+                                    </div>
+                                    <span class="status-indicator"></span>
+                                </div>
+                                <div class="card-body">
+                                    <p>Leitura e Conversão de XML para Planilha</p>
+                                    <p>Automatize a extração de dados de arquivos XML e converta-os para planilhas estruturadas em segundos.</p>
+                                    <div class="card-footer">
+                                        <span>Processo Automatizado</span>
+                                        <button class="btn-automatizar" data-nav="xml_converter">Automatizar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2 -->
+                            <div class="card glow-effect">
+                                <div class="card-header">
+                                    <div class="status-left">
+                                        <span class="material-symbols-outlined">app_registration</span>
+                                        <p>RENOMEIO INTELIGENTE</p>
+                                    </div>
+                                    <span class="status-indicator"></span>
+                                </div>
+                                <div class="card-body">
+                                    <p>Renomeio de Documentos</p>
+                                    <p>Renomeio de arquivos em PDF de acordo com filtros/palavra-chave para definir como renomear o arquivo.</p>
+                                    <div class="card-footer">
+                                        <span>Modificação de Arquivo</span>
+                                        <button class="btn-automatizar" data-nav="rename">Automatizar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 3 -->
+                            <div class="card glow-effect">
+                                <div class="card-header">
+                                    <div class="status-left">
+                                        <span class="material-symbols-outlined">rule</span>
+                                        <p>SEPARAÇÃO AUTOMÁTICA</p>
+                                    </div>
+                                    <span class="status-indicator"></span>
+                                </div>
+                        <div class="card-body">
+                            <p>Separador de Documentos PDF/TXT</p>
+                            <p>Separe documentos PDF/TXT através de uma palavra-chave inserida no campo de pesquisa.</p>
+                            <div class="card-footer">
+                                <span>Separe Documentos</span>
+                                <button class="btn-automatizar" data-nav="separator">Automatizar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Fim Grid Cards -->
+            </main>
+        </div>
+    </section>
+
+    <section id="contato" class="view">
+        <div class="contato-container">
+
+            <!-- Conteúdo Principal -->
+            <main class="contato-main-wrapper">
+                <div class="contato-main">
+
+                    <!-- Formulário (esquerda) -->
+                    <aside class="card-contato" role="region" aria-labelledby="contato-titulo">
+                        <form class="form-contato" id="formContato">
+                            <h3 id="contato-titulo" class="titulo-form">Envie uma mensagem</h3>
+
+                            <label for="nome">Nome Completo</label>
+                            <input type="text" id="nome" name="nome" class="input-contato" placeholder="Digite seu nome">
+
+                            <label for="email">E-mail</label>
+                            <input type="email" id="email" name="email" class="input-contato" placeholder="Seu e-mail">
+
+                            <label for="mensagem">Mensagem</label>
+                            <textarea id="mensagem" name="mensagem" class="textarea-contato" placeholder="Escreva sua mensagem"></textarea>
+
+                            <button type="submit" class="btn-contato">Enviar</button>
+                        </form>
+                    </aside>
+
+                    <!-- Coluna direita: Informações de contato -->
+                    <div class="contato-right">
+                        <header class="contato-header"></header>
+
+                        <section class="contato-info" aria-label="Informações de contato">
+                            <div class="info-item">
+                                <h1 class="contato-title">Entre em contato</h1>
+                                <p class="contato-sub">Saiba mais sobre como a robotsystem pode transformar a automação de seus processos!</p>
+                                <span class="material-symbols-outlined icon">phone</span>
+                                <div class="info-text">
+                                    <div class="info-title">Celular</div>
+                                    <div class="info-value">(11) 95619-7970</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <span class="material-symbols-outlined icon">email</span>
+                                <div class="info-text">
+                                    <div class="info-title">Email</div>
+                                    <div class="info-value">robotsystem@gmail.com</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <span class="material-symbols-outlined icon">group</span>
+                                <div class="info-text">
+                                    <div class="info-title">Instagram</div>
+                                    <div class="info-value">@robotsystem</div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div> <!-- .contato-main -->
+            </main>
+        </div>
+    </section>
+
+    <section id="xml_converter" class="view">
+        <div class="xml-container">
+
+        <!-- Main Content -->
+        <main class="xml-main">
+            <div class="xml-center">
+                <h1 class="xml-title">Conversor XML → Planilha (Excel/CSV)</h1>
+                <p class="xml-sub">Escolha a pasta de entrada (XMLs) e a pasta de saída (Excel/CSV). Depois clique em Converter.</p>
+
+                <div class="card-wrapper-xml">
+
+                <!-- Rings decorativos -->
+                <div class="rings-container">
+                    <div class="ring ring-1"></div>
+                    <div class="ring ring-2"></div>
+                    <div class="ring ring-3"></div>
+                </div>
+
+                <!-- Card principal -->
+                <article class="card-xml" role="region" aria-labelledby="xml-title">
+
+                    <div class="card-header">
+                    <div class="status-left">
+                        <span class="material-symbols-outlined">switch_access_2</span>
+                        <p class="status-text">AUTOMAÇÃO PRONTA</p>
+                    </div>
+                    <div class="status-dot" title="status"></div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="card-content">
+
+                    <!-- Linha: pasta de origem -->
+                    <div class="row">
+                        <input id="sourcePath" class="input-path" placeholder="Caminho da pasta de entrada:" readonly/>
+                        <button id="btnSelectSource" class="btn-select">Selecionar</button>
+                    </div>
+
+                    <!-- Linha: pasta de destino -->
+                    <div class="row">
+                        <input id="targetPath" class="input-path" placeholder="Caminho da pasta de saída:" readonly/>
+                        <button id="btnSelectTarget" class="btn-select">Selecionar</button>
+                    </div>
+                    
+                    <div class="position-action">
+                        <!-- Formato de saída -->
+                        <div class="format-filter">
+                            <label for="outputFormat">Formato de saída:</label>
+                            <select id="outputFormat" class="select-doc">
+                            <option value="csv">.csv</option>
+                            <option value="excel">.xlsx</option>
+                            </select>
+                        </div>
+
+                    <!-- Botão Converter -->
+                        <div class="actions-row">
+                            <button id="btnConvert" class="btn-convert">Iniciar</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Barra de progresso -->
+                    <div class="progress-block">
+                        <div class="xml-progress-bar">
+                        <div class="progress-fill-xml" style="width:0%"></div>
+                        </div>
+                        <div class="progress-info">
+                        <span class="progress-percent">0%</span>
+                        </div>
+                    </div>
+
+                    </div>
+                </article>
+
+                </div>
+            </div>
+            </main>
+        </div>
+    </section>
+
+    <section id="rename" class="view">
+        <div class="rename-container">
+
+            <!-- Main Content -->
+            <main class="rename-main">
+            <div class="rename-center">
+                <h1 class="rename-title">Renomeie Arquivos com Filtros</h1>
+                <p class="">Escolha a pasta de entrada e a pasta de saída. Depois clique em Converter.</p>
+
+                <div class="card-wrapper-rename">
+
+                <!-- Rings decorativos -->
+                <div class="rings-container">
+                    <div class="ring ring-1"></div>
+                    <div class="ring ring-2"></div>
+                    <div class="ring ring-3"></div>
+                </div>
+
+                <!-- Card principal -->
+                <article class="card-rename" role="region" aria-labelledby="rename-title">
+
+                    <div class="card-header">
+                    <div class="status-left">
+                        <span class="material-symbols-outlined">sort_by_alpha</span>
+                        <p class="status-text">AUTOMAÇÃO PRONTA</p>
+                    </div>
+                    <div class="status-dot" title="status"></div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="card-content">
+
+                    <!-- Linha: pasta de origem -->
+                    <div class="row">
+                        <input id="renameSourcePath" class="input-path" placeholder="Caminho da pasta de entrada:" readonly/>
+                        <button type="button" id="btnRenameSelectSource" class="btn-select">Selecionar</button>
+                    </div>
+
+                    <!-- Linha: pasta de destino -->
+                    <div class="row">
+                        <input id="renameTargetPath" class="input-path" placeholder="Caminho da pasta de saída:" readonly/>
+                        <button type="button" id="btnRenameSelectTarget" class="btn-select">Selecionar</button>
+                    </div>
+
+
+                    <div class="position-action">
+
+                        <!-- Filtro de pesquisa -->
+                        <div class="format-filter">
+                            <label for="renameOutputFormat">Formato de pesquisa:</label>
+                            <select id="renameOutputFormat" class="select-doc">
+                            <option value="nome">Nome</option>
+                            <option value="cpf">CPF</option>
+                            <option value="cnpj">CNPJ</option>
+                            </select>
+                        </div>
+
+                        <!-- Botão Converter -->
+                        <div class="actions-row">
+                            <button id="btnRename" class="btn-convert">Iniciar</button>
+                        </div>
+
+                    </div>
+                    <!-- Barra de progresso -->
+                    <div class="progress-block">
+                        <div class="rename-progress-bar">
+                        <div class="progress-fill-rename" style="width:0%"></div>
+                        </div>
+                        <div class="progress-info">
+                        <span class="progress-percent">0%</span>
+                        </div>
+                    </div>
+
+                    </div>
+                </article>
+
+                </div>
+            </div>
+            </main>
+        </div>
+    </section>
+
+    <section id="separator" class="view">
+        <div class="separator-wrap">
+
+            <main class="separator-main">
+                <div class="separator-center">
+                    <h1 class="separator-title">Executar Separador Personalizado de Documentos</h1>
+                    <p class="separator-sub">Informe o parâmetro, selecione as pastas e clique em Confirmar para iniciar.</p>
+
+                    <div class="card-wrapper-separator">
+
+                                            <!-- Rings decorativos -->
+                <div class="rings-container">
+                    <div class="ring ring-1"></div>
+                    <div class="ring ring-2"></div>
+                    <div class="ring ring-3"></div>
+                </div>
+
+                        <article class="card-separator">
+                            <div class="card-header">
+                                <div class="status-left">
+                                    <span class="material-symbols-outlined" aria-hidden="true">rebase</span>
+                                    <p class="status-text">AUTOMAÇÃO PRONTA</p>
+                                </div>
+                                <div class="status-dot" title="status"></div>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div class="card-content">
+                                <div class="row">
+                                    <input id="paramInput" class="input-path" placeholder="Digite o parâmetro" />
+                                    <button id="btnConfirmParam" class="btn-select">Confirmar</button>
+                                </div>
+
+                                <div class="row">
+                                    <input id="sourcePathFunc" class="input-path" placeholder="Caminho da pasta de entrada" readonly />
+                                    <button id="btnSelectSourceFunc" class="btn-select">Selecionar</button>
+                                    <input id="fileSourcePickerFunc" type="file" webkitdirectory directory multiple style="display:none" />
+                                </div>
+
+                                <div class="row">
+                                    <input id="targetPathFunc" class="input-path" placeholder="Caminho da pasta de saída" readonly />
+                                    <button id="btnSelectTargetFunc" class="btn-select">Selecionar</button>
+                                    <input id="fileTargetPickerFunc" type="file" webkitdirectory directory multiple style="display:none" />
+                                </div>
+
+                                <div class="actions-row">
+                                    <button id="btnSeparator" class="btn-convert">Iniciar</button>
+                                </div>
+
+                                <div id="progress-separator" class="progress-block">
+                                    <div class="sep-progress-bar">
+                                        <div class="progress-fill-separator" style="width:0%"></div>
+                                    </div>
+                                    <div class="progress-info">
+                                        <span class="progress-percent">0%</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </section>
+
+    <!-- Bibliotecas externas -->
+    <script src="libs/crypto-js.js"></script> <!-- Biblioteca externa usada em criptografia -->
+
+    <!-- Módulos JS do projeto -->
+    <script type="module" src="api.js"></script>
+    <script type="module" src="actions.js"></script>
+    <script type="module" src="progress.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="navigation.js"></script>
+    <script type="module" src="storage.js"></script>
+</body>

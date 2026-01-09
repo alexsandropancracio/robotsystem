@@ -1,0 +1,130 @@
+Relatório de Alterações e Correções – 27/12/2025
+1️⃣ Contexto inicial
+
+Problema principal: A função de conversão de XMLs (converter_xml) estava sempre gerando CSV, mesmo quando o usuário selecionava Excel (.xlsx) no front-end.
+
+Observação: A função em converter.py estava correta, gerando CSV ou Excel conforme o parâmetro formato.
+
+Suspeita inicial: O problema estava no módulo api_services.py ou na integração com o JS/HTML.
+
+2️⃣ Estrutura de arquivos envolvida
+
+Backend / Python
+
+src/app/converter.py – função principal de conversão (converter_xml), responsável por:
+
+Ler a pasta de entrada de XMLs.
+
+Extrair dados de cada nota fiscal.
+
+Criar CSV ou Excel consolidado (um único arquivo).
+
+Atualizar barra de progresso via progress_signal.
+
+src/app/api_services.py – camada que integra Python com a interface JS/HTML via PyWebView.
+
+Inicialmente, tentava criar um arquivo por XML (arquivo_saida = os.path.join(caminho_saida, f"{nome_base}{extensao}")) → incompatível com a lógica de converter.py.
+
+Função principal:
+
+def converter_xml(self, caminho_entrada, caminho_saida, formato="csv"):
+    ...
+    converter_func(pasta_entrada=arquivo_entrada, pasta_saida=arquivo_saida, formato=fmt)
+    ...
+
+
+Problema detectado: lógica de gerar vários arquivos.
+
+Frontend / JS
+
+src/static/js/actions.js – código responsável por capturar a ação do usuário e chamar o Python via PyWebView.
+
+HTML:
+
+<select id="outputFormat" class="select-doc">
+    <option value="csv">.csv</option>
+    <option value="excel">.xlsx</option>
+</select>
+
+3️⃣ Passos de análise e correção
+Passo 1 – Ajuste da lógica em api_services.py
+
+Alteramos para gerar apenas um arquivo consolidado, compatível com o converter.py.
+
+Código ajustado:
+
+arquivo_saida = caminho_saida  # agora o converter.py decide o nome do arquivo final
+converter_func(
+    pasta_entrada=caminho_entrada,
+    pasta_saida=arquivo_saida,
+    formato=fmt,
+    progress_signal=self
+)
+
+
+Antes: tentava gerar um arquivo por XML → conflito com converter.py.
+
+Depois: gera apenas um arquivo (notas_convertidas.csv ou notas_convertidas.xlsx).
+
+Passo 2 – Identificação do problema no JS
+
+No actions.js:
+
+const fmtSelect = document.getElementById("formatSelect"); // errado
+
+
+No HTML:
+
+<select id="outputFormat" ...>
+
+
+Conflito de ID → JS sempre caía no fallback "csv".
+
+Passo 3 – Correção do JS (actions.js)
+const fmtSelect = document.getElementById("outputFormat"); // correto
+const fmt = fmtSelect ? fmtSelect.value : "csv";
+console.log("[DEBUG] Formato selecionado:", fmt);
+
+
+Agora o JS captura corretamente o formato selecionado pelo usuário.
+
+Envia "csv" ou "excel" para o Python (api_services.py) via PyWebView.
+
+Resultado:
+
+>>> FORMATO RECEBIDO: excel
+
+
+Converte e salva na pasta de saída como .xlsx quando selecionado.
+
+4️⃣ Logs e testes
+
+Logs confirmaram:
+
+JS seleciona corretamente o formato.
+
+Python recebe e envia para converter.py.
+
+converter.py gera arquivo único, CSV ou Excel, de acordo com o parâmetro.
+
+Testes realizados:
+
+Seleção .csv → arquivo notas_convertidas.csv gerado com sucesso.
+
+Seleção .xlsx → arquivo notas_convertidas.xlsx gerado com sucesso.
+
+Barras de progresso no front-end atualizadas corretamente.
+
+5️⃣ Conclusão
+
+✅ Problema principal: inconsistência entre o ID do select no HTML e a referência no JS + lógica de múltiplos arquivos no api_services.py.
+
+✅ Soluções aplicadas:
+
+api_services.py ajustado para trabalhar com arquivo único.
+
+actions.js corrigido para capturar o ID correto do select (outputFormat).
+
+Testes confirmaram conversão para CSV e Excel funcionando corretamente.
+
+Logs detalhados incluídos para facilitar futuras análises.

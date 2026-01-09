@@ -1,0 +1,16 @@
+LOGIN
+ └─► access_token (JWT curto)
+ └─► refresh_token (longo, persistido no banco)
+
+REQUEST AUTENTICADA
+ └─► Authorization: Bearer <access_token>
+ └─► deps/auth.py
+ └─► get_current_user
+ └─► usuário válido
+ └─► endpoint (/me, /protected, etc)
+
+TOKEN EXPIRADO
+ └─► refresh_token
+ └─► rotate_refresh_token
+ └─► novo access_token
+ └─► novo refresh_token

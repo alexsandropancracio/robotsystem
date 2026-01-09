@@ -1,0 +1,32 @@
+C:\Users\Alex\Documents\robotsystem\src\
+├── .env                    # Variáveis de ambiente globais
+├── .gitignore               # Arquivos ignorados no Git
+├── alembic/                 # Configuração de migrações de banco de dados
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/            # Arquivos de versão de migração
+├── app/                     # Aplicativo principal (utilitário ou frontend integrado)
+│   ├── api.py
+│   ├── auth.py
+│   ├── config.py
+│   └── window.py
+├── assets/                  # Recursos estáticos (fonts, images)
+├── backend/                 # Backend principal (FastAPI)
+│   ├── api/                 # Estrutura modular da API
+│   │   ├── core/            # Lógica central: auth, config, security
+│   │   ├── db/              # Configuração DB + session + base
+│   │   ├── deps/            # Dependências para rotas (auth, db, license, user)
+│   │   ├── models/          # Modelos ORM: user, license, refresh_token
+│   │   ├── repositories/    # Repositórios para CRUD
+│   │   ├── routes/          # Rotas FastAPI
+│   │   ├── schemas/         # Schemas Pydantic
+│   │   ├── scripts/         # Scripts de teste e criação de dados
+│   │   └── services/        # Serviços de negócio (auth, user, refresh_token)
+├── docker-compose.yml       # Orquestração Docker
+├── main.py                  # Ponto de entrada principal
+├── services/                # Utilitários independentes do backend
+├── ui/                      # Frontend (HTML/JS/CSS)
+└── venv/                    # Ambiente virtual Python
+
+
+alex@DESKTOP-67SJ00L:/mnt/c/Users/Alex/Documents/robotsystem/src$ tree -L 3

@@ -1,0 +1,35 @@
+docker compose --env-file .env.dev -f docker-compose.dev.yml up (.env.dev)
+docker compose --env-file .env.prod -f docker-compose.prod.yml up -d (.env.prod)
+
+[Seu PC] --(docker-compose.dev.yml)--> [Container Dev]
+        (alterações refletidas, banco no container)
+ 
+Após finalizar:
+[Seu PC] --(build + envio da imagem)--> [Servidor]
+        docker-compose.prod.yml roda backend + banco no servidor
+
+
+Estratégia pro Docker
+
+Dev:
+
+docker-compose.dev.yml vai montar volume do backend/ dentro do container.
+
+Assim você consegue atualizar o backend sem rebuildar a imagem.
+
+Postgres também roda no container, acessível localmente.
+
+Prod:
+
+docker-compose.prod.yml vai buildar a imagem com o backend dentro.
+
+Não depende do volume local, ou seja, servidor só roda o que está na imagem.
+
+Postgres também roda no container ou no servidor.
+
+Arquivos .env:
+
+.env.dev para desenvolvimento (porta local, usuários de teste)
+
+.env.prod para produção (senhas seguras, banco remoto se houver)
+

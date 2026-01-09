@@ -1,0 +1,46 @@
+Tudo que é LADO PYTHON (sinais, funções, emitir progresso, etc.)
+
+👉 Fica em:
+
+src/app/bridge.py
+
+
+Esse arquivo é o único responsável por:
+
+ter os @pyqtSlot
+
+ter os sinais (pyqtSignal)
+
+emitir sinais (self.progressoAtualizado.emit(pct))
+
+receber chamadas JS
+
+rodar funções Python (ex: separar PDFs)
+
+📌 Resumo:
+➡️ bridge.py = comunicação Python ↔ JS
+
+Tudo que é LADO JAVASCRIPT (UI, barra, WebChannel, eventos, DOM)
+
+👉 Fica em:
+
+src/ui/script.js
+
+
+Esse arquivo é o único responsável por:
+
+iniciar o QWebChannel
+
+conectar os sinais do Python:
+
+window.pyBridge.progressoAtualizado.connect(...)
+
+
+atualizar a UI
+
+mexer no DOM (barra, texto, mensagens, status)
+
+📌 Resumo:
+➡️ script.js = interface do usuário (recebe sinais, atualiza tela)
+
+Tudo que conversa com HTML/DOM fica no script.js; tudo que conversa com Python (sinais, funções) fica no bridge.py.

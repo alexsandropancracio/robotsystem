@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv/
+venv/
+**/.venv/
+**/venv/
+
+# Environment variables
+.env
+**/.env
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Caches de teste
+.cache/
+pytest_cache/
+
+# Alembic cache
+alembic/versions/__pycache__/
+
+# Node / Frontend (se existir)
+node_modules/
+dist/
+build/
+
+# Arquivos temporários / backups
+*.swp
+*.bak

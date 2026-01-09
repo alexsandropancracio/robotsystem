@@ -1,0 +1,256 @@
+📄 RELATÓRIO TÉCNICO – Migração de QWebChannel para PyWebview com API Integrada
+1. Introdução
+
+O projeto RobotSystem inicialmente utilizava QWebChannel para comunicação entre o código JavaScript da interface (HTML/JS) e a lógica escrita em Python.
+Apesar de funcional, essa abordagem apresentava limitações de compatibilidade, estabilidade e complexidade.
+
+Diante disso, realizamos a migração completa para o PyWebview, utilizando sua arquitetura nativa de API Python → JavaScript.
+O objetivo da migração foi reduzir erros, simplificar o código e melhorar a integração entre o Python e o front-end.
+
+2. Motivos da Migração
+2.1 Problemas e limitações do QWebChannel
+
+O QWebChannel trouxe vários problemas práticos:
+
+❌ Complexidade exagerada
+
+Necessidade de criar arquivos .qml, objetos de ponte e expor métodos manualmente.
+
+Comunicação baseada em sinais e slots, exigindo configuração extra.
+
+❌ Erros recorrentes e difíceis de rastrear
+
+Mensagens de erro como:
+"QueryInterface to IDCompositionDevice4 failed"
+"TypeError: undefined is not an object"
+
+Esperava que o document estivesse pronto, exigindo sincronização manual.
+
+❌ Dependência pesada e incompatibilidades
+
+QtWebEngine é pesado (centenas de MB).
+
+Conflitos de versões com Qt 5, Qt 6, Python 3.13.
+
+Diferentes comportamentos no Windows e Linux.
+
+❌ Dificuldade em enviar dados para o JS com estabilidade
+
+Necessário conectar sinais e aguardar readyState no JS.
+
+2.2 Vantagens do PyWebview
+
+A migração para PyWebview trouxe um conjunto de melhorias claras:
+
+✔ Comunicação nativa e simples via API
+
+O PyWebview permite fazer isto:
+
+Python → JS
+
+self.window.evaluate_js("alert('Olá do Python!')")
+
+
+JS → Python
+
+window.pywebview.api.minha_funcao()
+
+
+Sem QML, sem canais, sem sinais.
+
+✔ Mais leve, mais rápido, mais estável
+
+PyWebview usa WebKit ou Edge Chromium.
+
+Não depende do QtWebEngine, removendo centenas de MB de dependências.
+
+Reduziu travamentos e logs de erro.
+
+✔ Código mais limpo e organizado
+
+O Python ficou organizado em uma classe única chamada Api, onde todos os métodos ficam centralizados:
+
+class Api:
+    def converter_xml(self, src, tgt):
+        ...
+
+✔ Chamadas assíncronas automáticas
+
+O PyWebview cria promessas automaticamente no JS:
+
+window.pywebview.api.converter_xml().then(...)
+
+
+Sem precisar programar nada extra.
+
+✔ Melhor suporte para multithreading
+
+PyWebview possui métodos próprios para garantir que threads trabalhem sem travar a GUI, algo que era complicado com Qt.
+
+3. Mudanças realizadas no código
+3.1 Criação da classe API
+
+Criamos a classe:
+
+class Api:
+    def __init__(self, window):
+        self.window = window
+
+
+Nela foram centralizados:
+
+seleção de pastas
+
+conversão de XML
+
+separação de documentos
+
+atualizações de progresso
+
+retorno para o JavaScript
+
+Todos os métodos agora são mais curtos, mais legíveis e sem dependências externas.
+
+3.2 Substituição total dos sinais do QWebChannel
+
+O que antes era:
+
+self.bridge.progressoAtualizado.emit(pct)
+
+
+Agora é:
+
+self.window.evaluate_js(f"window.onProgressoAtualizado({pct})")
+
+
+Direto, simples e sem risco de race condition.
+
+3.3 Ajustes no JavaScript
+
+Antes o JS dependia disto:
+
+window.pyBridge.progressoAtualizado.connect(...)
+
+
+Agora o JS só faz:
+
+window.onProgressoAtualizado = function(pct) {
+    ...
+}
+
+
+Mucho mais clean e direto.
+
+3.4 Navegação SPA simplificada
+
+O script.js foi reorganizado:
+
+inicialização única
+
+listeners claros
+
+callbacks vindos do Python
+
+separação de funções de pasta / conversão / progresso
+
+O código hoje está limpo, modular e fácil de manter.
+
+3.5 Janela abrindo maximizada automaticamente
+
+Adicionamos:
+
+def init(window):
+    window.maximize()
+
+
+E no start:
+
+webview.start(func=init, args=(window,))
+
+
+Agora o software abre em modo profissional, ocupando a tela inteira.
+
+4. Impacto da Migração
+4.1 Impactos Positivos
+🚀 1. Estabilidade muito maior
+
+Acabaram:
+
+loops de erros no console
+
+travamentos no QWebChannel
+
+problemas com atraso de sinais
+
+🧠 2. Código mais fácil de dar manutenção
+
+A comunicação é direta, não tem camadas escondidas.
+
+🎯 3. Redução de complexidade
+
+Removemos:
+
+QWebChannel
+
+obj Bridge
+
+importações extras
+
+scripts duplicados
+
+🎛 4. Maior controle da janela
+
+Agora podemos:
+
+maximizar
+
+fullscreen
+
+redimensionar
+
+manipular a UI
+
+⚙ 5. Melhor compatibilidade
+
+Funciona de forma igual:
+
+Windows
+
+Linux
+
+Mac
+
+Python 3.12/3.13
+
+Qt 6/Edge/Chromium
+
+🔧 6. Multithreading real sem travar o JS
+
+PyWebview executa os métodos Python em threads nativas sem congelar a UI.
+
+5. Conclusão
+
+A migração do QWebChannel para PyWebview representou um enorme avanço na arquitetura do RobotSystem.
+
+Resumo das melhorias:
+
+✔ Comunicação Python ↔ JS mais limpa e simples
+✔ Sistema mais estável e rápido
+✔ Código mais organizado e profissional
+✔ Remoção de camadas complexas do Qt
+✔ Interface mais responsiva
+✔ Threads funcionando corretamente
+✔ Melhor experiência para o usuário final
+✔ Facilita futuras expansões do software
+
+O sistema agora está mais moderno, sustentável e maduro para evoluir em novas funcionalidades como:
+
+login
+
+dashboard
+
+gráficos
+
+relatórios
+
+integrações externas

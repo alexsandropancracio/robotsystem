@@ -1,0 +1,6 @@
+sudo apt update
+sudo apt install software-properties-common -y
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+Instale Python 3.(version) + venv + dev:
+sudo apt install python3.(version) python3.(version)-venv python3.(version)-dev -y

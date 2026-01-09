@@ -1,0 +1,323 @@
+RELATÓRIO TÉCNICO – BASE DO BACKEND
+1️⃣ Containerização com Docker (Base do Ambiente)
+📌 O que foi feito
+
+Criamos um Dockerfile específico para a API (backend/Dockerfile)
+
+Definimos:
+
+Imagem base: python:3.12-slim
+
+Diretório de trabalho: /app
+
+Variáveis de ambiente importantes:
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+
+Instalamos dependências de sistema necessárias para o Postgres (gcc, libpq-dev)
+
+Instalamos dependências Python via requirements.txt
+
+Copiamos todo o projeto para dentro do container
+
+Subimos a aplicação com uvicorn
+
+🎯 Objetivo
+
+Garantir que:
+
+O backend rode igual em qualquer máquina
+
+Não haja dependência do ambiente local
+
+O projeto esteja pronto para produção futuramente
+
+2️⃣ Orquestração com Docker Compose
+📌 O que foi feito
+
+Criamos um docker-compose.yml com dois serviços principais:
+
+🔹 Serviço postgres
+postgres:
+  image: postgres:16
+  container_name: robotsystem-postgres
+  env_file:
+    - .env
+  volumes:
+    - postgres_data:/var/lib/postgresql/data
+
+✔ Resultado
+
+Banco de dados PostgreSQL isolado
+
+Configuração via .env
+
+Persistência de dados garantida
+
+🔹 Serviço api
+api:
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+  container_name: robotsystem-api
+  env_file:
+    - .env
+    - backend/.env
+
+✔ Resultado
+
+API rodando dentro de container
+
+Comunicação direta com o Postgres
+
+Hot reload (--reload) ativo para desenvolvimento
+
+3️⃣ Volume Persistente do Banco de Dados
+📌 O que foi feito
+
+Criamos o volume:
+
+volumes:
+  postgres_data:
+
+
+Montado em:
+
+/var/lib/postgresql/data
+
+🎯 Impacto
+
+Mesmo que:
+
+O container do Postgres seja removido
+
+O docker-compose down seja executado
+
+👉 Os dados do banco NÃO são apagados
+
+⚠️ Só são removidos se:
+
+docker volume rm postgres_data
+
+4️⃣ Estrutura de Imports Absolutos (Padrão Profissional)
+📌 O que foi feito
+
+Definimos PYTHONPATH=/app
+
+Passamos a usar imports absolutos, por exemplo:
+
+from backend.api.db.session import engine
+from backend.api.core.config import get_settings
+
+🎯 Por que isso é importante
+
+Evita bugs em produção
+
+Facilita testes
+
+Evita problemas com paths relativos
+
+Escala melhor conforme o projeto cresce
+
+✔ Padrão usado em empresas grandes
+
+5️⃣ Configuração Centralizada (Settings)
+📌 Arquivo
+backend/api/core/config.py
+
+📌 O que foi feito
+
+Criamos uma classe Settings usando BaseSettings
+
+Centralizamos:
+
+Ambiente
+
+API
+
+Segurança
+
+Banco de dados
+
+Lemos variáveis automaticamente do .env
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
+settings = get_settings()
+
+🎯 Impacto
+
+Um único ponto de verdade
+
+Fácil trocar ambiente (dev, staging, prod)
+
+Código mais limpo e seguro
+
+6️⃣ Conexão com Banco de Dados (SQLAlchemy)
+📌 Arquivo
+backend/api/db/session.py
+
+📌 O que foi feito
+
+Criamos a engine do SQLAlchemy usando settings.DATABASE_URL
+
+Configuramos:
+
+pool_pre_ping=True
+
+SessionLocal
+
+engine = create_engine(
+    settings.DATABASE_URL,
+    pool_pre_ping=True,
+)
+
+🧪 Teste realizado
+
+Dentro do container:
+
+from backend.api.db.session import engine
+
+with engine.connect() as conn:
+    print("🔥 Conectado com sucesso ao Postgres!")
+
+✅ Resultado
+
+Conexão funcionando
+
+Banco acessível
+
+Infraestrutura validada ponta a ponta
+
+7️⃣ Organização e Boas Práticas Gerais
+
+✔ Separação clara de responsabilidades
+✔ Código preparado para crescer
+✔ Arquitetura limpa
+✔ Sem gambiarras
+✔ Pronto para:
+
+autenticação
+
+migrações
+
+segurança
+
+deploy futuro
+
+🧠 Conclusão Técnica
+
+Neste estágio, o RobotSystem possui:
+
+✅ Ambiente totalmente containerizado
+✅ Banco persistente e confiável
+✅ Backend operacional
+✅ Configuração profissional
+✅ Base sólida para autenticação e regras de negócio
+
+8️⃣ FastAPI como Framework da API
+📌 O que foi feito
+
+O backend do RobotSystem foi construído usando FastAPI
+
+A aplicação é inicializada a partir de:
+
+backend/api/main.py
+
+
+O servidor é executado com:
+
+uvicorn backend.api.main:app
+
+
+A API roda:
+
+Dentro de um container Docker
+
+Exposta na porta 8000
+
+Com suporte a hot reload em ambiente de desenvolvimento
+
+🎯 Por que FastAPI?
+
+Alto desempenho (baseado em Starlette + Pydantic)
+
+Validação automática de dados
+
+Geração automática de documentação (Swagger / OpenAPI)
+
+Excelente integração com SQLAlchemy
+
+Padrão moderno para APIs REST profissionais
+
+✅ Resultado
+
+API operacional dentro do container
+
+Pronta para receber:
+
+rotas
+
+dependências
+
+autenticação
+
+middlewares
+
+versionamento
+
+9️⃣ Ambiente de Desenvolvimento com WSL (Ubuntu)
+📌 O que foi feito
+
+Todo o projeto está sendo desenvolvido usando:
+
+WSL (Windows Subsystem for Linux)
+
+Distribuição: Ubuntu
+
+Docker e Docker Compose estão rodando dentro do ambiente Linux, não diretamente no Windows
+
+🎯 Impacto técnico
+
+Ambiente muito mais próximo de produção
+
+Menos problemas de compatibilidade
+
+Melhor performance com Docker
+
+Padronização do ambiente de desenvolvimento
+
+📂 Estrutura de trabalho
+/mnt/c/Users/Alex/Documents/robotsystem/src
+
+
+Código armazenado no Windows
+
+Executado no contexto Linux via WSL
+
+Containers acessando o projeto corretamente via bind / copy
+
+🔗 Integração Geral (Resumo Atualizado)
+
+✔ FastAPI rodando com Uvicorn
+✔ Docker + Docker Compose no WSL Ubuntu
+✔ PostgreSQL com volume persistente
+✔ SQLAlchemy conectado com sucesso
+✔ Configuração centralizada (Settings)
+✔ Imports absolutos (backend.api.*)
+✔ Ambiente preparado para produção
+
+🧠 Conclusão Final (Atualizada)
+
+O RobotSystem atualmente possui:
+
+🔥 Uma API FastAPI moderna
+🐧 Rodando em Linux (WSL Ubuntu)
+🐳 Totalmente containerizada
+🗄️ Com banco persistente
+🧩 Arquitetura limpa e escalável

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Teste SPA</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #222;
+            color: #fff;
+        }
+
+        nav a {
+            margin-right: 15px;
+            color: #aaa;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        nav a:hover {
+            color: #fff;
+        }
+
+        .section {
+            display: none;
+            padding: 20px;
+        }
+
+        .active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a onclick="navigate('home')">Home</a>
+        <a onclick="navigate('funcionalidades')">Funcionalidades</a>
+        <a onclick="navigate('precos')">Preços</a>
+    </nav>
+
+    <!-- Seções -->
+    <div id="home" class="section active">
+        <h1>Home</h1>
+        <p>Bem-vindo ao teste SPA!</p>
+    </div>
+
+    <div id="funcionalidades" class="section">
+        <h1>Funcionalidades</h1>
+        <p>Aqui estarão as funcionalidades do app.</p>
+    </div>
+
+    <div id="precos" class="section">
+        <h1>Preços</h1>
+        <p>Veja os preços e planos disponíveis.</p>
+    </div>
+
+    <script src="bridge.js"></script>
+</body>
+
+</html>

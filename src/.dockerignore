@@ -1,0 +1,35 @@
+# Virtualenv local
+.venv
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Git
+.git
+.gitignore
+
+# Logs
+*.log
+
+# IDE / Editor
+.vscode
+.idea
+
+# Docker env files locais
+.env
+.env.local
+
+# Caches de testes
+.cache
+pytest_cache
+
+# Alembic cache
+alembic/versions/__pycache__
+
+# Node / Frontend (se existir)
+node_modules
+dist
+build

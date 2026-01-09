@@ -1,0 +1,240 @@
+# Relatório Técnico – Funcionalidade **Separator (PDF)**
+
+## 1. Visão Geral
+
+Este documento descreve, de forma **técnica, detalhada e profissional**, a implementação da funcionalidade **Separator de Documentos PDF por Termos** no projeto **RobotSystem**.
+
+O objetivo principal da funcionalidade é:
+
+* Ler documentos PDF a partir de uma pasta de origem
+* Identificar conteúdos textuais com base em **parâmetros informados pelo usuário**
+* Copiar os PDFs correspondentes para uma pasta de destino
+* Atualizar o progresso no front-end em tempo real
+* Garantir separação clara entre **camada de serviço**, **camada de API** e **camada de interface (JS)**
+
+A solução foi construída respeitando **boas práticas de engenharia de software**, incluindo desacoplamento, responsabilidade única, previsibilidade de estados e observabilidade via logs.
+
+---
+
+## 2. Arquitetura Geral
+
+### 2.1 Camadas Envolvidas
+
+A funcionalidade está distribuída em três camadas bem definidas:
+
+```
+UI (HTML / JS)
+   ↓
+API (PyWebView – api_services.py)
+   ↓
+Serviço de Domínio (separator.py)
+```
+
+### 2.2 Responsabilidades
+
+| Camada                 | Responsabilidade                                                                    |
+| ---------------------- | ----------------------------------------------------------------------------------- |
+| UI (JS)                | Interação com usuário, validação visual, controle de estado e exibição de progresso |
+| API (ServicesAPI)      | Orquestração, validações, cálculo de progresso e comunicação JS ↔ Python            |
+| Serviço (separator.py) | Regra de negócio pura: leitura de PDFs e separação por termos                       |
+
+---
+
+## 3. Problema Inicial Identificado
+
+Durante o desenvolvimento inicial, foram observados os seguintes problemas arquiteturais:
+
+* Progresso sendo calculado **dentro do serviço** (`separator.py`)
+* Uso de callbacks misturados entre serviço e API
+* Assinaturas de funções inconsistentes
+* Funções não expostas corretamente no `js_api`
+* Erros de runtime como:
+
+  * `TypeError: separar_documentos() is not a function`
+  * `unexpected keyword argument 'parametro'`
+
+Esses sintomas indicavam **acoplamento indevido** entre camadas e violação do princípio de responsabilidade única.
+
+---
+
+## 4. Decisão Arquitetural
+
+### 4.1 Princípio Adotado
+
+> **Serviços não devem conhecer UI nem progresso visual.**
+
+Portanto:
+
+* `separator.py` passou a ser um **serviço puro**
+* Toda lógica de progresso foi movida para a **API (ServicesAPI)**
+* A API passou a controlar o loop, o progresso e a comunicação com o front-end
+
+Essa decisão trouxe:
+
+* Previsibilidade
+* Testabilidade
+* Reutilização
+* Eliminação de progresso “fake”
+
+---
+
+## 5. Implementação do Serviço (separator.py)
+
+### 5.1 Características
+
+* Não conhece JS
+* Não conhece PyWebView
+* Não emite progresso
+* Não faz validação de UI
+
+### 5.2 Responsabilidade Única
+
+O serviço executa apenas:
+
+* Leitura de PDFs
+* Extração de texto
+* Normalização de texto (unidecode + lowercase)
+* Verificação de termos
+* Cópia de arquivos
+
+### 5.3 Fluxo Interno
+
+1. Validação de parâmetros
+2. Varredura recursiva por PDFs
+3. Leitura do conteúdo textual
+4. Match por termos
+5. Cópia para pasta destino
+6. Retorno de resultado textual
+
+---
+
+## 6. Implementação da API (api_services.py)
+
+### 6.1 Papel da API
+
+A API atua como **orquestradora** entre:
+
+* UI (JS)
+* Serviço de separação
+
+Ela é responsável por:
+
+* Validar entradas
+* Listar arquivos
+* Controlar o loop de processamento
+* Calcular progresso real
+* Enviar progresso ao front-end
+
+### 6.2 Loop Controlado
+
+```python
+for i, arquivo in enumerate(arquivos, start=1):
+    separar_documentos_por_termos(...)
+    pct = int((i / total) * 100)
+    atualizar_progresso(pct)
+```
+
+Isso garante:
+
+* Progresso proporcional real
+* Atualização previsível
+* Sem dependência interna do serviço
+
+---
+
+## 7. Comunicação com o Front-End
+
+### 7.1 Atualização de Progresso
+
+A comunicação é feita via:
+
+```python
+self.window.evaluate_js(
+    f"window.atualizarProgressoSeparator({pct});"
+)
+```
+
+Com proteção defensiva:
+
+```python
+if hasattr(self, "window") and self.window:
+```
+
+---
+
+## 8. Controle de Estado no Front-End
+
+### 8.1 Parâmetro Confirmado
+
+Foi implementado um **estado explícito** para o parâmetro:
+
+* `window.PARAMETRO_CONFIRMED`
+* `window.PARAMETRO_CONFIRMED_VALUE`
+
+### 8.2 Invalidação Automática
+
+Qualquer alteração no input invalida a confirmação, garantindo:
+
+* Coerência entre UI e backend
+* Eliminação de erros silenciosos
+* UX profissional
+
+---
+
+## 9. Observabilidade e Logs
+
+### 9.1 Logs Estruturados
+
+Exemplos:
+
+```text
+[SEPARADOR] Iniciando separação
+[SEPARADOR][PROGRESS] 62%
+[SEPARADOR] Finalizado | 18/18 arquivos processados
+```
+
+Benefícios:
+
+* Debug rápido
+* Auditoria de execução
+* Diagnóstico em produção
+
+---
+
+## 10. Erros Resolvidos Durante o Processo
+
+| Erro                    | Causa                   | Solução                       |
+| ----------------------- | ----------------------- | ----------------------------- |
+| função não encontrada   | API não exposta         | Uso correto de `api.services` |
+| keyword inesperada      | Assinaturas divergentes | Padronização da função        |
+| progresso inconsistente | Progresso no serviço    | Centralização na API          |
+
+---
+
+## 11. Estado Final da Funcionalidade
+
+✅ Separação funcional
+
+✅ Progresso real
+
+✅ Arquitetura limpa
+
+✅ Serviço desacoplado
+
+✅ API previsível
+
+✅ UX consistente
+
+---
+
+## 12. Conclusão
+
+A funcionalidade **Separator** atingiu um nível de maturidade compatível com **aplicações profissionais desktop**, seguindo padrões que engenheiros de software experientes utilizam em produção.
+
+A separação clara de responsabilidades, aliada a um controle explícito de estado e progresso, elimina classes inteiras de bugs e torna o sistema sustentável para evolução futura.
+
+Este módulo está **pronto para escala, manutenção e testes automatizados**.
+
+---
+
+📌 *Relatório elaborado com foco em engenharia de software, arquitetura limpa e boas práticas.*

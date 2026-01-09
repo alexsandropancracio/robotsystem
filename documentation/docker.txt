@@ -1,0 +1,8 @@
+Ação	Comando
+Subir em background	docker compose up -d
+Rebuildar	docker compose up -d --build
+Ver status	docker compose ps
+Ver logs	docker logs <container>
+Logs em tempo real	docker logs -f <container>
+Parar tudo	docker compose down
+
