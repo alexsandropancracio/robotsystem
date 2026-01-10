@@ -1,19 +1,13 @@
-# backend/api/routes/auth.py
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 from backend.api.deps.database import get_db
-from backend.api.schemas.auth import (
-    LoginRequest,
-    TokenResponse,
-    RefreshTokenRequest,
-)
-#from backend.api.services.auth_services import authenticate_user
-from backend.api.services.refresh_token_service import RefreshTokenService
-from backend.api.core.security import create_access_token
-from backend.api.core.exceptions import InvalidCredentialsError
-from backend.api.services import user_service
+from backend.api.schemas.auth import RefreshTokenRequest
 from backend.api.schemas.user import UserLogin, Token
+from backend.api.services.auth_service import login_service
+from backend.api.services.refresh_token_service import RefreshTokenService
+from backend.api.core.auth import create_access_token
+from backend.api.core.exceptions import InvalidCredentialsError
 
 router = APIRouter(
     prefix="/auth",
@@ -28,16 +22,19 @@ def login(
     user_in: UserLogin,
     db: Session = Depends(get_db),
 ):
-    """
-    Login do usuário
-    """
     try:
-        return user_service.login_user_service(db, user_in)
+        return login_service(
+            db,
+            user_in.email,
+            user_in.password,
+        )
+
     except InvalidCredentialsError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
         )
+
 
 # -------------------------------------------------
 # LOGOUT
@@ -47,9 +44,6 @@ def logout(
     data: RefreshTokenRequest,
     db: Session = Depends(get_db),
 ):
-    """
-    Revoga explicitamente um refresh token.
-    """
     refresh_service = RefreshTokenService(db)
 
     revoked = refresh_service.revoke_refresh_token(data.refresh_token)
@@ -63,33 +57,28 @@ def logout(
 # -------------------------------------------------
 # REFRESH TOKEN
 # -------------------------------------------------
-@router.post("/refresh", response_model=TokenResponse)
+@router.post("/refresh", response_model=Token)
 def refresh_token(
     data: RefreshTokenRequest,
     db: Session = Depends(get_db),
 ):
-    """
-    Rotaciona refresh token:
-    - valida token atual
-    - revoga o antigo
-    - cria um novo
-    - gera novo access token
-    """
     refresh_service = RefreshTokenService(db)
 
-    new_refresh = refresh_service.rotate_refresh_token(data.refresh_token)
-    if not new_refresh:
+    result = refresh_service.rotate_refresh_token(data.refresh_token)
+
+    if not result:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token inválido ou expirado",
         )
 
+    user, new_refresh_token = result
+
     access_token = create_access_token(
-        subject=str(new_refresh.user.id)
+        {"sub": str(user.id)}
     )
 
-    return TokenResponse(
+    return Token(
         access_token=access_token,
-        refresh_token=new_refresh.token,
-        token_type="bearer",
+        refresh_token=new_refresh_token,
     )

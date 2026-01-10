@@ -1,7 +1,7 @@
 # backend/api/routes/me.py
 
 from fastapi import APIRouter, Depends
-from backend.api.deps.auth import get_current_user
+from backend.api.core.auth import get_current_user
 from backend.api.models.user import User
 from backend.api.schemas.user import UserRead
 

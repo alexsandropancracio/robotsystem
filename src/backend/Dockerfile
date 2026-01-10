@@ -1,5 +1,5 @@
 # 1️⃣ Imagem base
-FROM python:3.12-slim
+FROM python:3.10-slim
 
 # 2️⃣ Variáveis de ambiente para Python
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -41,3 +41,6 @@ CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 #docker exec -it robotsystem-api-dev bash
 ##alembic upgrade head
+
+#docker compose -f docker-compose.dev.yml up -d --build (iniciar container)
+#docker compose -f docker-compose.dev.yml down (parar container)

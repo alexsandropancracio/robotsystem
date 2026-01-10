@@ -1,0 +1,341 @@
+O user_service está fazendo papel demais.
+O auth_service nasce para dividir essa responsabilidade.
+
+Isso não é correção de erro, é evolução de arquitetura.
+
+🧠 O JEITO CERTO DE PENSAR (MODELO MENTAL)
+
+Vamos deixar isso bem explícito:
+
+🔹 user_service.py
+
+Cuida de:
+
+criar usuário
+
+buscar usuário
+
+listar usuário
+
+dados do usuário
+
+📌 Ele conhece o usuário, não o processo de login.
+
+🔹 auth_service.py
+
+Cuida de:
+
+login
+
+validação de credenciais
+
+geração de tokens
+
+orquestrar refresh
+
+📌 Ele conhece o processo de autenticação, não o domínio do usuário.
+
+🔹 core/security / core/auth
+
+Cuida de:
+
+hash de senha
+
+JWT
+
+criptografia
+
+decodificação
+
+📌 Ele não conhece banco nem FastAPI.
+
+🔹 routes
+
+Cuida de:
+
+HTTP
+
+status code
+
+request / response
+
+📌 Ele não conhece regra de negócio.
+
+Se o código:
+
+gera hash
+
+cria token
+
+valida token
+
+👉 é core
+
+Se o código:
+
+decide login
+
+autentica usuário
+
+orquestra serviços
+
+👉 é servisce
+
+📌 O papel correto do user_service
+
+Antes de olhar função por função, grava isso:
+
+user_service = regras de negócio do usuário
+auth_service = autenticação, sessão e tokens
+
+Se um dia você desligar JWT e usar OAuth, Google, SSO etc:
+
+user_service não muda
+
+auth_service muda tudo
+
+Isso é Clean Architecture na veia.
+
+🚨 Onde mora o problema (e você já sentiu)
+
+Agora vamos às partes problemáticas — não porque estão “erradas”, mas porque estão no lugar errado.
+
+❌ login_user_service
+def login_user_service(db: Session, user_in: UserLogin) -> Token:
+
+O que ela faz hoje?
+
+busca usuário
+
+verifica senha
+
+cria access token
+
+cria refresh token
+
+📌 Isso é AUTENTICAÇÃO
+📌 Isso é SESSÃO
+📌 Isso é SEGURANÇA
+
+👉 Não é responsabilidade do user_service
+
+Mesmo que o código funcione, arquiteturalmente:
+❌ errado
+
+❌ refresh_token_service
+def refresh_token_service(db: Session, token: str) -> Optional[Token]:
+
+
+Mesma lógica:
+
+decodifica JWT
+
+valida token
+
+gera novos tokens
+
+📌 Isso é controle de sessão
+📌 Isso é auth flow
+
+👉 não pertence ao domínio de usuário
+
+🧠 Então o diagnóstico é:
+Hoje o user_service está:
+
+👤 User domain
+
+🔐 Auth service
+
+🔁 Token rotation
+
+👉 papel demais para um único arquivo
+
+Como ficará o fluxo (mentalmente)
+ROUTE (/auth/login)
+        |
+        v
+auth_service.login(...)
+        |
+        |--> user_repository.get_by_email()
+        |--> verify_password()
+        |--> create tokens
+        |--> save refresh
+        |
+        v
+    TokenResponse
+
+
+👉 O user_service não participa do login
+
+🔐 core/auth.py
+
+Responsável por:
+
+hash / verify senha
+
+criação e decode de JWT
+
+dependências FastAPI (get_current_user)
+
+regras técnicas de autenticação
+
+👉 Camada técnica transversal
+
+🔄 RefreshTokenService
+
+Responsável por:
+
+persistência de refresh token
+
+revogação
+
+validação contra banco
+
+expiração lógica
+
+rotação futura
+
+👉 Camada de domínio / negócio
+
+🧩 AuthService
+
+Responsável por:
+
+login
+
+orquestrar auth + refresh
+
+validar usuário
+
+devolver tokens
+
+👉 Camada de orquestração
+
+👤 UserService
+
+Responsável por:
+
+CRUD de usuário
+
+perfil
+
+atualização de dados
+
+👉 Nunca mais toca em token
+
+"chore: remove duplicated security module, unify auth logic"
+
+“Esse cara entende separação de responsabilidades, segurança e fluxo de autenticação de verdade.”
+
+Então vamos ajustar onde cada coisa mora e por quê.
+
+🧠 VISÃO FINAL (ANTES DE MEXER EM CÓDIGO)
+📁 core/auth.py
+
+👉 Infra + integração com FastAPI
+
+JWT (access)
+
+hash / verify senha
+
+dependências (get_current_user)
+
+OAuth2
+
+📁 services/auth_service.py
+👉 Orquestração
+
+login
+
+valida credenciais
+
+gera tokens
+
+chama RefreshTokenService
+
+📁 services/refresh_token_service.py
+👉 Domínio
+
+criar
+
+validar
+
+revogar
+
+rotacionar refresh token
+
+📁 core/config.py
+👉 Fonte única de configuração
+
+tempos de expiração
+
+algoritmo
+
+segredo
+
+Nós tomamos a decisão arquitetural (correta) de que:
+
+❌ core/security.py não é mais a fonte de verdade
+
+✅ core/auth.py é o único responsável por JWT, hash e auth
+
+Mas o seu routes/auth.py ainda está importando do arquivo antigo.
+
+📌 Resultado:
+
+erro de import
+
+ou pior: fluxo de token inconsistente
+
+🚨 OUTRO PROBLEMA (AINDA MAIS IMPORTANTE)
+
+Além disso, o seu routes/auth.py está fazendo lógica demais.
+
+Exemplo:
+
+refresh_service = RefreshTokenService(db)
+new_refresh = refresh_service.rotate_refresh_token(...)
+access_token = create_access_token(...)
+
+
+👉 Isso não é papel da rota.
+
+A rota deve:
+
+receber request
+
+chamar um service
+
+devolver response
+
+Nada mais.
+
+✅ SOLUÇÃO CORRETA (ARQUITETURA LIMPA)
+
+Vamos corrigir duas coisas:
+
+1️⃣ Imports errados
+2️⃣ Responsabilidade errada da rota
+
+🧠 O QUE MUDOU (E POR QUE ISSO É BOM)
+✅ Antes (ruim)
+
+rota gerava token
+
+rota conhecia banco
+
+rota conhecia lógica de rotação
+
+dependia de core/security.py
+
+✅ Agora (profissional)
+
+rota só orquestra
+
+auth_service decide o fluxo
+
+refresh_service cuida do ciclo de vida
+
+core/auth.py é a única fonte de JWT
+
+📌 Isso é arquitetura limpa real.

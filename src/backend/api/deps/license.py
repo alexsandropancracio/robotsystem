@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 
-from backend.api.deps.auth import get_current_user
+from backend.api.core.auth import get_current_user
 from backend.api.deps.database import get_db
 from backend.api.models.user import User
 from backend.api.models.license import License

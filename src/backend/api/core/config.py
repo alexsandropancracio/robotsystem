@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
     MAX_REFRESH_TOKENS_PER_USER: int = 3
 
     POSTGRES_USER: str

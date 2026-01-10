@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException, status
-from backend.api.deps.auth import get_current_user
+from backend.api.core.auth import get_current_user
 from backend.api.models.user import User
 
 def require_admin(

@@ -1,0 +1,61 @@
+1️⃣ Validação de campos
+
+O que melhorar:
+
+Registro:
+
+Email: garantir formato válido com regex ou Pydantic EmailStr.
+
+Senha: checar mínimo de caracteres e força (maiúscula, minúscula, número, símbolo).
+
+Evitar campos vazios (nome, username, etc).
+
+Login:
+
+Checar se email ou username foi fornecido, nunca permitir vazio.
+
+Mensagens de erro consistentes, ex.: Email ou senha inválidos.
+
+Como reforça a arquitetura:
+
+Evita que dados ruins cheguem no banco.
+
+Padroniza validação em um ponto (usando Pydantic Schemas), tornando fácil escalar ou adicionar novos campos.
+
+2️⃣ Usuário ativo
+
+O que melhorar:
+
+Atualmente is_active está sempre True.
+
+Precisamos ativação via token de e-mail:
+
+Ao registrar, usuário recebe token de 6 dígitos no e-mail.
+
+Endpoint /auth/activate recebe token e ativa a conta (is_active=True).
+
+get_current_user já respeita is_active → pronto para proteger rotas futuramente.
+
+Como reforça a arquitetura:
+
+Garante que apenas usuários verificados usem a aplicação.
+
+Mantém separação clara entre registro, ativação e autenticação.
+
+3️⃣ Limites de refresh tokens
+
+O que melhorar:
+
+Config já tem MAX_REFRESH_TOKENS_PER_USER.
+
+Implementar lógica para:
+
+Ao criar um novo refresh token, remover o mais antigo se passar do limite.
+
+Pode ser automático no serviço de refresh tokens (RefreshTokenService).
+
+Como reforça a arquitetura:
+
+Mantém segurança (não deixa acumular tokens válidos antigos).
+
+Facilita auditoria e limpeza futura.

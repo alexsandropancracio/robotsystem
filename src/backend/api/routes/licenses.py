@@ -6,7 +6,7 @@ from typing import List
 from backend.api.schemas.license import LicenseCreate, LicenseRead, LicenseUpdate
 from backend.api.services import license_service
 from backend.api.deps.database import get_db
-from backend.api.deps.auth import get_current_user
+from backend.api.core.auth import get_current_user
 from backend.api.models.user import User
 from backend.api.deps.admin import require_admin
 
