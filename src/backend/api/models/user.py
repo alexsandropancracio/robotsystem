@@ -52,19 +52,6 @@ class User(Base):
     )
 
     # =========================
-    # VERIFICAÇÃO DE E-MAIL
-    # =========================
-    email_verification_token: Mapped[str | None] = mapped_column(
-        String(6),
-        nullable=True,
-    )
-
-    email_verification_expires_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True),
-        nullable=True,
-    )
-
-    # =========================
     # AUDITORIA
     # =========================
     created_at: Mapped[datetime] = mapped_column(
@@ -95,4 +82,10 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
         passive_deletes=True,
+    )
+
+    activation_tokens = relationship(
+        "ActivationToken",
+        back_populates="user",
+        cascade="all, delete-orphan",  # útil para deletar tokens se o usuário for deletado
     )

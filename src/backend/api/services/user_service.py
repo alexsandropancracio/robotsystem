@@ -8,6 +8,7 @@ from backend.api.models.user import User
 from backend.api.schemas.user import UserCreate, UserRead
 from backend.api.repositories.user_repository import UserRepository
 from backend.api.core.auth import hash_password
+from backend.api.core.exceptions import UserAlreadyExistsError
 
 repo = UserRepository()
 
@@ -16,13 +17,13 @@ repo = UserRepository()
 # -------------------
 def create_user_service(db: Session, user_in: UserCreate) -> UserRead:
     if repo.get_by_email(db, user_in.email):
-        raise ValueError("Usuário já existe")
+        raise UserAlreadyExistsError("Usuário já existe")
 
     user = User(
         email=user_in.email,
         full_name=getattr(user_in, "full_name", None),
         hashed_password=hash_password(user_in.password),
-        is_active=True,
+        is_active=False,
         created_at=datetime.utcnow(),
         updated_at=datetime.utcnow(),
     )

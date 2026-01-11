@@ -339,3 +339,17 @@ refresh_service cuida do ciclo de vida
 core/auth.py é a única fonte de JWT
 
 📌 Isso é arquitetura limpa real.
+
+Você agora tem 4 fluxos separados e claros:
+
+Fluxo	Schema
+Login	LoginRequest
+Refresh	RefreshTokenRequest
+Logout	RefreshTokenRequest
+Ativação de conta	ActivateAccountRequest
+
+✔️ Model (ActivationToken)
+✔️ Repository (ActivationTokenRepository)
+✔️ Service (ActivationTokenService)
+✔️ Exception (InvalidActivationTokenError)
+✔️ Schema (ActivateAccountRequest)

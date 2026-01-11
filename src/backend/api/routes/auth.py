@@ -8,6 +8,9 @@ from backend.api.services.auth_service import login_service
 from backend.api.services.refresh_token_service import RefreshTokenService
 from backend.api.core.auth import create_access_token
 from backend.api.core.exceptions import InvalidCredentialsError
+from backend.api.schemas.auth import ActivateAccountRequest
+from backend.api.services.activation_token_service import ActivationTokenService
+from backend.api.core.exceptions import InvalidActivationTokenError
 
 router = APIRouter(
     prefix="/auth",
@@ -82,3 +85,24 @@ def refresh_token(
         access_token=access_token,
         refresh_token=new_refresh_token,
     )
+
+
+
+@router.post("/activate", status_code=status.HTTP_204_NO_CONTENT)
+def activate_account(
+    data: ActivateAccountRequest,
+    db: Session = Depends(get_db),
+):
+    activation_service = ActivationTokenService(db)
+
+    try:
+        activation_service.activate_user(
+            user=data.user,  # ou busca por email
+            token=data.token,
+        )
+
+    except InvalidActivationTokenError as e:
+        raise HTTPException(
+            status_code=e.status_code,
+            detail=e.detail,
+        )

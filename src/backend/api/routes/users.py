@@ -9,6 +9,9 @@ from backend.api.models.user import User
 from backend.api.schemas.user import UserCreate, UserRead
 from backend.api.services import user_service
 from backend.api.core.exceptions import UserAlreadyExistsError
+import logging
+
+logger = logging.getLogger("robotsystem.users")
 
 router = APIRouter(
     prefix="/users",
@@ -47,7 +50,14 @@ def list_users(
     """
     Lista todos os usuários (protegido)
     """
-    return user_service.list_users_service(db)
+    try:
+        return user_service.list_users_service(db)
+    except Exception as e:
+        logger.error(f"Erro ao listar usuários: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro inesperado ao listar usuários"
+        )
 
 
 # -------------------

@@ -1,4 +1,4 @@
-# backend/api/db/base.py
+# backend/api/database/base.py
 from sqlalchemy.orm import DeclarativeBase
 
 class Base(DeclarativeBase):
