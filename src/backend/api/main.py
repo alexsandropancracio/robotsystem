@@ -1,3 +1,4 @@
+#backend/api/main.py
 from fastapi import FastAPI
 from backend.api.core.config import get_settings
 from backend.api.routes import users, auth, health, me

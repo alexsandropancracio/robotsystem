@@ -59,3 +59,152 @@ Como reforça a arquitetura:
 Mantém segurança (não deixa acumular tokens válidos antigos).
 
 Facilita auditoria e limpeza futura.
+
+
+Etapa 1 — Revisão final da autenticação atual
+
+Objetivo: garantir que login, refresh token e logout estão funcionando 100%, de forma segura e consistente.
+
+✅ Já temos:
+
+Registro de usuário (/users/register)
+
+Login (/auth/login) → gera access_token e refresh_token
+
+Refresh token (/auth/refresh) → rotaciona refresh token corretamente
+
+Logout (/auth/logout) → revoga refresh token
+
+Ações finais:
+
+Revisar mensagens de erro para padronização
+
+Garantir get_current_user bloqueia usuário inativo (is_active=False)
+
+Validar limite de refresh tokens por usuário (MAX_REFRESH_TOKENS_PER_USER)
+
+Etapa 2 — Validação de entrada e regras de senha
+
+Objetivo: impedir dados inválidos de chegarem ao banco e reforçar segurança.
+
+No registro:
+
+Email válido (EmailStr do Pydantic)
+
+Senha segura (mínimo 8 caracteres, letras + números + símbolos)
+
+Campos obrigatórios não vazios
+
+No login:
+
+Checar que email e senha foram enviados
+
+Mensagens de erro consistentes → não revelar se usuário existe ou não
+
+💡 Isso deixa a API mais segura e profissional, pronto para auditoria futura.
+
+Etapa 3 — Ativação de conta por e-mail
+
+Objetivo: garantir que apenas usuários com e-mail válido possam se autenticar.
+
+Fluxo:
+
+Usuário se registra → is_active = False
+
+Endpoint /auth/send-activation envia token de 6 dígitos por e-mail
+
+Usuário envia token em /auth/activate → ativa conta (is_active = True)
+
+get_current_user já respeita is_active
+
+💡 Aqui é onde o backend começa a se parecer com um sistema “real” de produção.
+
+Etapa 4 — Limite de refresh tokens e limpeza automática
+
+Objetivo: manter segurança e controle sobre tokens emitidos.
+
+Serviço de refresh tokens (RefreshTokenService) deve:
+
+Contar quantos tokens ativos o usuário possui
+
+Revogar o mais antigo se exceder MAX_REFRESH_TOKENS_PER_USER
+
+Limpeza periódica de tokens expirados → pronto para cron job/job futuro
+
+Etapa 5 — Padronização de erros e responses
+
+Objetivo: frontend e testes consigam lidar de forma previsível com erros.
+
+Criar exceptions customizadas (ex.: InvalidRefreshTokenError, UserInactiveError)
+
+Responses sempre no formato:
+
+{
+  "status_code": 401,
+  "detail": "Token inválido"
+}
+
+
+Evitar 500 para erros previsíveis → sempre tratar exceções de negócio
+
+---------------------------------------------------------------------------------------05:50 10/01/2026
+
+
+
+No próximo passo, vamos escrever juntos:
+
+/auth/send-activation
+
+/auth/activate
+
+tratamento de exceções
+
+responses consistentes
+
+sem e-mail real ainda (mock seguro)
+
+Isso é exatamente como sistemas reais fazem
+
+Fluxo profissional real:
+
+Criar endpoints
+
+Validar regras
+
+Cobrir cenários
+
+Integrar frontend
+
+Só então:
+
+Gmail
+
+Outlook
+
+SendGrid
+
+SES
+
+Background jobs
+
+📌 Você está fazendo na ordem certa.
+
+❓ Vamos criar esses endpoints agora?
+
+👉 SIM
+
+/auth/send-activation
+
+/auth/activate
+
+❓ Por que não enviar e-mail agora?
+
+👉 Porque:
+
+não é core do backend
+
+adiciona complexidade externa
+
+não agrega segurança agora
+
+atrasa validação do sistema

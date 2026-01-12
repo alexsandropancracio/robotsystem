@@ -353,3 +353,110 @@ Ativação de conta	ActivateAccountRequest
 ✔️ Service (ActivationTokenService)
 ✔️ Exception (InvalidActivationTokenError)
 ✔️ Schema (ActivateAccountRequest)
+
+FastAPI → API
+
+SQLAlchemy ORM → Banco de dados
+
+Pydantic → Schemas
+
+JWT (access + refresh) → Auth
+
+SMTP (depois) → Envio de e-mail
+
+Arquitetura em camadas
+
+routes
+
+services
+
+repositories
+
+models
+
+schemas
+
+Responsabilidade correta foi mantida
+
+Você fez algo MUITO BOM aqui 👇
+Separou corretamente:
+
+activate_account(email, token) → fluxo externo (endpoint)
+
+activate_user(user, token) → regra de negócio interna
+
+Isso é arquitetura limpa, de verdade.
+
+📌 Quais são as colunas em questão?
+
+O Alembic detectou que no model User elas não existem mais, mas no banco ainda existem:
+
+users.email_verification_token
+
+users.email_verification_expires_at
+
+Essas colunas representam o modelo antigo de verificação por e-mail.
+
+🧠 O que mudou no nosso projeto?
+
+Nós evoluímos a arquitetura.
+
+Antes:
+
+O usuário guardava o token de ativação dentro da própria tabela users.
+
+Agora:
+
+O token de ativação vive em uma tabela própria: activation_tokens.
+
+Isso não é detalhe — isso é design correto.
+
+🏗️ Por que o modelo antigo é ruim?
+
+Guardar token de ativação no users gera vários problemas:
+
+❌ Problemas do modelo antigo
+
+Só permite um token por usuário
+
+Dificulta reenvio de ativação
+
+Mistura estado de autenticação com dados do usuário
+
+Não permite histórico
+
+Não escala bem para:
+
+reset de senha
+
+múltiplos dispositivos
+
+auditoria
+
+✅ Por que o modelo novo é melhor?
+
+Com activation_tokens:
+
+✔️ Benefícios claros
+
+Separação de responsabilidades (SRP)
+
+Tokens viram entidades
+
+Podemos:
+
+invalidar tokens antigos
+
+ter expiração
+
+marcar como used
+
+Mesmo padrão usado em:
+
+refresh tokens
+
+password reset
+
+MFA futuramente
+
+📌 Esse é o padrão de sistemas profissionais.

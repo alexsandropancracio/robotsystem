@@ -5,6 +5,9 @@ from sqlalchemy.orm import sessionmaker
 from backend.api.core.config import get_settings
 from backend.api.database.base import Base
 
+# 👇 IMPORTANTE: força o carregamento dos models
+from backend.api.models import *  # noqa: F401
+
 settings = get_settings()
 
 DATABASE_URL = settings.DATABASE_URL
@@ -29,3 +32,5 @@ def get_db():
         yield db
     finally:
         db.close()
+
+print(Base.metadata.tables.keys())

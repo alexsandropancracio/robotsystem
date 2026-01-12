@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from backend.api.models.user import User
 from backend.api.deps.database import get_db
-from backend.api.schemas.auth import RefreshTokenRequest
 from backend.api.schemas.user import UserLogin, Token
 from backend.api.services.auth_service import login_service
 from backend.api.services.refresh_token_service import RefreshTokenService
 from backend.api.core.auth import create_access_token
 from backend.api.core.exceptions import InvalidCredentialsError
-from backend.api.schemas.auth import ActivateAccountRequest
+from backend.api.schemas.auth import ActivateAccountRequest, SendActivationRequest, RefreshTokenRequest
 from backend.api.services.activation_token_service import ActivationTokenService
 from backend.api.core.exceptions import InvalidActivationTokenError
 
@@ -86,23 +86,61 @@ def refresh_token(
         refresh_token=new_refresh_token,
     )
 
-
-
-@router.post("/activate", status_code=status.HTTP_204_NO_CONTENT)
+# -------------------------------------------------
+# ATIVAÇÃO DE CONTA
+# -------------------------------------------------
+@router.post("/activate", status_code=status.HTTP_200_OK)
 def activate_account(
     data: ActivateAccountRequest,
     db: Session = Depends(get_db),
 ):
-    activation_service = ActivationTokenService(db)
+    """
+    Ativa a conta do usuário usando o token enviado por e-mail.
+    """
+    service = ActivationTokenService(db)
 
     try:
-        activation_service.activate_user(
-            user=data.user,  # ou busca por email
+        service.activate_account(
+            email=data.email,
             token=data.token,
         )
-
-    except InvalidActivationTokenError as e:
+    except InvalidActivationTokenError:
         raise HTTPException(
-            status_code=e.status_code,
-            detail=e.detail,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token inválido ou expirado.",
         )
+
+    return {
+        "message": "Conta ativada com sucesso."
+    }
+
+@router.post("/send-activation", status_code=status.HTTP_200_OK)
+def send_activation(
+    data: SendActivationRequest,
+    db: Session = Depends(get_db),
+):
+    user = (
+        db.query(User)
+        .filter(User.email == data.email)
+        .first()
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado",
+        )
+
+    if user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Conta já está ativa",
+        )
+
+    token = ActivationTokenService(db).create_activation_token(user)
+
+    # 🚧 TEMPORÁRIO: depois vira envio de e-mail
+    return {
+        "message": "Token de ativação enviado",
+        "activation_token": token,
+    }

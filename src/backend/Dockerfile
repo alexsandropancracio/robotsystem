@@ -30,17 +30,24 @@ EXPOSE 8000
 # 9️⃣ Comando padrão (pode ser sobrescrito pelo docker-compose)
 CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
-#docker compose -f docker-compose.dev.yml exec api bash
-#docker compose -f docker-compose.dev.yml exec postgres bash
-
-#psql -U user_dev -d robotsystem_dev
-
 #APP_ENV=dev uvicorn backend.api.main:app --reload(pra rodar o swagger)
 
 #docker compose -f docker-compose.dev.yml restart api
 
-#docker exec -it robotsystem-api-dev bash
 ##alembic upgrade head
 
+#container:
 #docker compose -f docker-compose.dev.yml up -d --build (iniciar container)
 #docker compose -f docker-compose.dev.yml down (parar container)
+#docker compose -f docker-compose.dev.yml exec api bash
+#docker compose -f docker-compose.dev.yml exec postgres bash
+
+#banco de dados:
+#psql -U user_dev -d robotsystem_dev
+
+#limpar imagens do container:
+#docker image prune -f
+#docker system prune -f
+
+#arquitetura do projeto:
+#tree -I ".venv|__pycache__|.git"

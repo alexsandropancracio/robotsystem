@@ -1,0 +1,338 @@
+root@fd59f3d2388b:/app# python - << 'EOF'
+import alembic
+import alembic.config
+print("Alembic import OK:", alembic.__version__)
+EOF
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+ModuleNotFoundError: No module named 'alembic.config'
+
+Perfeito. Agora ficou cristalino 🔥
+Esse output muda tudo — e confirma que o problema é mais profundo que o CLI.
+
+❌ ModuleNotFoundError: No module named 'alembic.config'
+mesmo ao importar direto pelo Python
+
+Isso NUNCA deveria acontecer em uma instalação válida do Alembic.
+
+Então vamos ao diagnóstico real, sem rodeio.
+
+🚨 DIAGNÓSTICO DEFINITIVO
+
+👉 O pacote alembic instalado no seu container NÃO é o Alembic real
+ou
+👉 Existe um conflito de namespace chamado alembic dentro do projeto ou do sistema
+
+Porque:
+
+O módulo alembic.config sempre existe no Alembic oficial
+
+Se ele não existe:
+
+ou o pacote foi sobrescrito
+
+ou tem um arquivo/pasta chamada alembic “na frente” do Python
+
+ou a instalação está corrompida por imagem base
+
+🧪 PROVA TÉCNICA (VAMOS VER O QUE O PYTHON ESTÁ IMPORTANDO)
+
+Roda isso exatamente assim no container:
+
+python - << 'EOF'
+import alembic
+print(alembic)
+print(alembic.__file__)
+print(dir(alembic))
+EOF
+
+
+👉 Isso vai nos dizer QUAL alembic está sendo importado.
+
+⚠️ Aposto alto que a saída vai mostrar algo como:
+
+/app/alembic/__init__.py
+
+ou /app/alembic.py
+
+ou algo que não seja site-packages/alembic/
+
+🔥 CAUSA MAIS COMUM (90% DOS CASOS)
+
+Você tem isso no projeto:
+
+/app/alembic/
+
+
+Ou seja:
+
+📁 a pasta de migrations chama alembic
+📦 o pacote Python também chama alembic
+
+👉 Resultado:
+o Python importa a pasta do projeto, não a lib
+
+E essa pasta NÃO tem config.py → 💥
+
+✅ CONFIRMAÇÃO RÁPIDA
+
+Roda:
+
+ls /app | grep alembic
+
+
+Se aparecer:
+
+alembic
+
+
+⚠️ Achamos o vilão.
+
+💣 POR QUE ISSO QUEBROU TUDO?
+
+Porque você tem:
+
+/app/alembic/          ← pasta de migrations
+/usr/local/lib/.../alembic/  ← lib real
+
+
+E o Python SEMPRE prioriza o diretório atual (/app) no sys.path.
+
+Resultado:
+
+import alembic
+# importa a pasta de migrations 🤡
+
+🛠️ SOLUÇÃO PROFISSIONAL (100% CORRETA)
+OPÇÃO A — RECOMENDADA (PADRÃO REAL)
+
+👉 Renomear a pasta de migrations
+
+Exemplo:
+
+mv alembic migrations
+
+
+Depois ajuste no alembic.ini:
+
+script_location = migrations
+
+
+E no comando:
+
+python -m alembic -c alembic.ini current
+
+OPÇÃO B — CONTORNO (MENOS LIMPO)
+
+No env.py, remover /app do sys.path (não recomendo no seu caso).
+
+🧠 POR QUE ISSO PASSOU BATIDO?
+
+Porque:
+
+o Alembic CLI tenta importar alembic.config
+
+mas cai na pasta de migrations
+
+que NÃO tem config.py
+
+e explode
+
+Isso é um erro clássico, até dev sênior cai nisso em Docker.
+
+✅ CHECKLIST DE CORREÇÃO
+
+Depois de renomear:
+
+python - << 'EOF'
+import alembic
+import alembic.config
+print("Alembic OK:", alembic.__version__)
+EOF
+
+
+Saída esperada:
+
+Alembic OK: 1.18.0
+
+🚀 DEPOIS DISSO
+
+Aí sim:
+
+python -m alembic current
+python -m alembic revision --autogenerate -m "initial schema"
+python -m alembic upgrade head
+
+
+Sem erro. Sem gambiarra. Sem fantasma.
+
+🎯 Conclusão (IMPORTANTE)
+
+❌ Não era Docker
+❌ Não era pip
+❌ Não era versão
+❌ Não era você
+
+✅ Era conflito de namespace (alembic/)
+
+Agora faz o teste do ls /app | grep alembic
+Me manda o output que eu já te digo exatamente qual passo seguir 👊🔥
+
+root@fd59f3d2388b:/app# python - << 'EOF'
+import alembic
+import alembic.config
+print("Alembic import OK:", alembic.__version__)
+EOF
+Traceback (most recent call last):
+  File "<stdin>", line 2, in <module>
+ModuleNotFoundError: No module named 'alembic.config'
+root@fd59f3d2388b:/app# python - << 'EOF'
+import alembic
+print(alembic)
+print(alembic.__file__)
+print(dir(alembic))
+EOF
+<module 'alembic' from '/app/alembic/__init__.py'>
+/app/alembic/__init__.py
+['__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__']
+root@fd59f3d2388b:/app# ls /app | grep alembic
+alembic
+alembic.ini
+
+Então, pra você analisar de fato o que está acontecendo...
+
+Perfeito. Agora temos prova irrefutável do que está acontecendo.
+Isso aqui é o ponto-chave 👇
+
+<module 'alembic' from '/app/alembic/__init__.py'>
+
+
+Ou seja:
+
+🚨 O Python NÃO está importando o Alembic da lib
+
+Ele está importando a sua pasta de migrations /app/alembic
+
+🎯 O PROBLEMA (100% CONFIRMADO)
+
+Você tem DOIS “alembics”:
+
+📦 Biblioteca real
+
+/usr/local/lib/python3.10/site-packages/alembic/
+
+
+📁 Pasta do projeto (migrations)
+
+/app/alembic/
+
+
+O Python sempre prioriza o diretório atual (/app) no sys.path, então:
+
+import alembic
+
+
+vira:
+
+import /app/alembic   ❌
+
+
+Essa pasta não tem config.py, por isso:
+
+ModuleNotFoundError: No module named 'alembic.config'
+
+
+👉 Não é bug
+👉 Não é versão
+👉 Não é Docker
+👉 É conflito de namespace clássico
+
+🛠️ SOLUÇÃO CORRETA (SEM GAMBIARRA)
+✅ Passo 1 — Renomear a pasta alembic/
+
+Dentro do container (ou no host):
+
+mv /app/alembic /app/migrations
+
+
+Agora você terá:
+
+/app/migrations
+/app/alembic.ini
+
+✅ Passo 2 — Ajustar o alembic.ini
+
+Abra o arquivo:
+
+nano alembic.ini
+
+
+Altere somente esta linha:
+
+script_location = migrations
+
+
+(antes era alembic)
+
+Salva.
+
+✅ Passo 3 — Teste de sanidade (ESSENCIAL)
+
+Agora roda:
+
+python - << 'EOF'
+import alembic
+import alembic.config
+print("Alembic OK:", alembic.__version__)
+print("Alembic path:", alembic.__file__)
+EOF
+
+✅ Saída esperada:
+
+Algo como:
+
+Alembic OK: 1.18.0
+Alembic path: /usr/local/lib/python3.10/site-packages/alembic/__init__.py
+
+
+👉 Se isso acontecer: problema resolvido definitivamente
+
+✅ Passo 4 — CLI volta a funcionar
+alembic --version
+alembic current
+
+
+Sem erro.
+
+🚀 AGORA SIM: MIGRATIONS
+1️⃣ Ver estado atual
+alembic current
+
+2️⃣ Criar migration
+alembic revision --autogenerate -m "create activation_tokens table"
+
+3️⃣ Aplicar no banco
+alembic upgrade head
+
+
+Depois:
+
+\dt
+
+
+E a tabela activation_tokens vai aparecer 🧠🔥
+
+🧠 POR QUE ISSO ACONTECE COM TODO MUNDO?
+
+Porque o Alembic por padrão cria a pasta chamada alembic/
+e o Python não protege contra shadowing de pacotes.
+
+É um erro tão comum que:
+
+devs seniores já caíram
+
+times inteiros já perderam horas nisso
+
+você só aprende quando dói 😅
+
+Agora você nunca mais cai nisso.
