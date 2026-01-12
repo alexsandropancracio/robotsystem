@@ -38,6 +38,8 @@ CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 #container:
 #docker compose -f docker-compose.dev.yml up -d --build (iniciar container)
+#docker compose -f docker-compose.dev.yml build --no-cache
+#docker compose -f docker-compose.dev.yml up -d
 #docker compose -f docker-compose.dev.yml down (parar container)
 #docker compose -f docker-compose.dev.yml exec api bash
 #docker compose -f docker-compose.dev.yml exec postgres bash

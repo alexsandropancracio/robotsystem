@@ -14,3 +14,10 @@ TOKEN EXPIRADO
  └─► rotate_refresh_token
  └─► novo access_token
  └─► novo refresh_token
+
+🔐 Agora o fluxo é PROFISSIONAL
+Etapa	O que acontece
+Geração	generate_token()
+Armazenamento	hash_token(token)
+Validação	verify_token()
+Banco	NUNCA vê token puro
