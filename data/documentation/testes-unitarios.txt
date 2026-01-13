@@ -1,0 +1,44 @@
+🚀 Sim, com teste unitários dá pra testar MUITA coisa (e é aí que o projeto vira sênior)
+
+Vou te mostrar o mapa mental do que agora você pode testar com facilidade:
+
+🔐 ActivationTokenService
+
+✔️ cria token
+
+✔️ não cria se usuário já estiver ativo
+
+✔️ invalida tokens antigos
+
+✔️ respeita expiração
+
+✔️ marca token como usado
+
+✔️ ativa usuário corretamente
+
+✔️ não ativa com token inválido
+
+👤 Auth
+
+login com credenciais válidas
+
+login com senha errada
+
+login com usuário inativo
+
+refresh token expirado
+
+refresh token revogado
+
+🔄 Segurança
+
+token não pode ser reutilizado
+
+token expira corretamente
+
+dois tokens → só o último funciona
+
+❝ Logs são para observar
+Testes são para confiar ❞
+
+Depois que a pessoa sente esse poder, não volta mais pra vida sem testes 😂

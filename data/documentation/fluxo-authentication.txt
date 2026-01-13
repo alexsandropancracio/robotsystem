@@ -21,3 +21,33 @@ Geração	generate_token()
 Armazenamento	hash_token(token)
 Validação	verify_token()
 Banco	NUNCA vê token puro
+
+Teste unitário:
+
+(.venv) alex@DESKTOP-67SJ00L:/mnt/c/Users/Alex/Documents/robotsystem/src$ pytest backend/tests -v
+================================================= test session starts =================================================
+platform linux -- Python 3.10.19, pytest-9.0.2, pluggy-1.6.0 -- /mnt/c/Users/Alex/Documents/robotsystem/src/.venv/bin/python3.10
+cachedir: .pytest_cache
+rootdir: /mnt/c/Users/Alex/Documents/robotsystem/src
+plugins: anyio-4.12.0, cov-7.0.0
+collected 7 items
+
+backend/tests/test_activation_token_service.py::test_create_activation_token PASSED                             [ 14%]
+backend/tests/test_activation_token_service.py::test_create_activation_token_for_active_user_raises_error PASSED [ 28%]
+backend/tests/test_activation_token_service.py::test_activate_user_with_valid_token PASSED                      [ 42%]
+backend/tests/test_activation_token_service.py::test_activate_user_with_invalid_token PASSED                    [ 57%]
+backend/tests/test_activation_token_service.py::test_activation_token_cannot_be_reused PASSED                   [ 71%]
+backend/tests/test_activation_token_service.py::test_cannot_activate_already_active_user PASSED                 [ 85%]
+backend/tests/test_activation_token_service.py::test_cannot_activate_with_expired_token PASSED                  [100%]
+
+================================================== 7 passed in 2.45s ==================================================
+
+✅ Tokens não expiram só no papel
+✅ Conta ativa não pode ser ativada de novo
+✅ Token não pode ser reutilizado
+✅ Token inválido não passa
+✅ Token expirado não passa
+✅ Regras de domínio estão blindadas
+✅ O serviço funciona sem depender de endpoint
+
+Implementei o fluxo de ativação de conta com tokens temporários e escrevi testes unitários cobrindo expiração, reutilização, tentativas inválidas e regras de domínio.

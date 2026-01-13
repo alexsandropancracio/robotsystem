@@ -1,16 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from backend.api.models.user import User
 from backend.api.deps.database import get_db
+from backend.api.models.user import User
 from backend.api.schemas.user import UserLogin, Token
+from backend.api.schemas.auth import (
+    ActivateAccountRequest,
+    SendActivationRequest,
+    RefreshTokenRequest,
+)
 from backend.api.services.auth_service import login_service
 from backend.api.services.refresh_token_service import RefreshTokenService
-from backend.api.core.auth import create_access_token
-from backend.api.core.exceptions import InvalidCredentialsError
-from backend.api.schemas.auth import ActivateAccountRequest, SendActivationRequest, RefreshTokenRequest
 from backend.api.services.activation_token_service import ActivationTokenService
-from backend.api.core.exceptions import InvalidActivationTokenError
+from backend.api.repositories.user_repository import UserRepository
+from backend.api.core.auth import create_access_token
+from backend.api.core.exceptions import (
+    InvalidCredentialsError,
+    InvalidActivationTokenError,
+)
 
 router = APIRouter(
     prefix="/auth",
@@ -86,6 +93,7 @@ def refresh_token(
         refresh_token=new_refresh_token,
     )
 
+
 # -------------------------------------------------
 # ATIVAÇÃO DE CONTA
 # -------------------------------------------------
@@ -95,7 +103,7 @@ def activate_account(
     db: Session = Depends(get_db),
 ):
     """
-    Ativa a conta do usuário usando o token enviado por e-mail.
+    Ativa a conta do usuário usando o token de 6 dígitos enviado por e-mail.
     """
     service = ActivationTokenService(db)
 
@@ -107,40 +115,44 @@ def activate_account(
     except InvalidActivationTokenError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token inválido ou expirado.",
+            detail="Token inválido ou expirado",
         )
 
     return {
-        "message": "Conta ativada com sucesso."
+        "message": "Conta ativada com sucesso"
     }
 
+
+# -------------------------------------------------
+# ENVIO DE TOKEN DE ATIVAÇÃO
+# -------------------------------------------------
 @router.post("/send-activation", status_code=status.HTTP_200_OK)
 def send_activation(
     data: SendActivationRequest,
     db: Session = Depends(get_db),
 ):
-    user = (
-        db.query(User)
-        .filter(User.email == data.email)
-        .first()
-    )
+    """
+    Envia um token de ativação para o e-mail do usuário.
+    """
+    user_repo = UserRepository()
+    user = user_repo.get_by_email(db, data.email)
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Não foi possível enviar o código de ativação",
         )
 
     if user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail="Conta já está ativa",
         )
 
     token = ActivationTokenService(db).create_activation_token(user)
 
-    # 🚧 TEMPORÁRIO: depois vira envio de e-mail
     return {
-        "message": "Token de ativação enviado",
+        "message": "Código de ativação enviado com sucesso",
+        # ⚠️ DEV ONLY — remover quando o envio de e-mail estiver ativo
         "activation_token": token,
     }

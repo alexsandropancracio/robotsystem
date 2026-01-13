@@ -43,6 +43,7 @@ CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 #docker compose -f docker-compose.dev.yml down (parar container)
 #docker compose -f docker-compose.dev.yml exec api bash
 #docker compose -f docker-compose.dev.yml exec postgres bash
+#docker logs -f robotsystem-api-dev(log)
 
 #banco de dados:
 #psql -U user_dev -d robotsystem_dev
