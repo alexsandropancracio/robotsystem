@@ -59,3 +59,39 @@ Testar se o e-mail seria enviado, não enviar de verdade
 💡 Exemplo:
 
 mock_mail_service.assert_called_once()
+
+Ordem correta a partir daqui (sem bagunça)
+
+✅ user_service (feito)
+
+🔜 auth_service + testes
+
+🔜 activation_token_service + testes
+
+🔜 envio de e-mail (mock)
+
+🔜 endpoints
+
+Onde estamos agora (checkpoint técnico)
+
+Você já tem 100% do core pronto e testado:
+
+✔ Criação de usuário
+✔ Hash de senha moderno (Argon2)
+✔ Login + JWT
+✔ Refresh token
+✔ Activation token (OTP)
+✔ Regras de segurança (expiração, uso único, usuário ativo)
+✔ Testes unitários passando
+
+✅ Pronto para crescer
+
+Depois você pode criar:
+
+password_reset_email_template
+
+login_alert_template
+
+two_factor_template
+
+Tudo no mesmo padrão.
