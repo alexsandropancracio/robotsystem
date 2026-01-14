@@ -54,3 +54,15 @@ CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 #arquitetura do projeto:
 #tree -I ".venv|__pycache__|.git"
+
+#teste unitário
+#pytest --cov=backend/api --cov-report=term-missing(linux/wls)
+#pytest backend/tests \
+  #--cov=backend/api \
+  #--cov-report=term-missing
+
+#pytest src/backend/tests --cov=src/backend/api --cov-report=term-missing
+#pytest src/backend/tests `
+  #--cov=src/backend/api `
+  #--cov-report=term-missing
+

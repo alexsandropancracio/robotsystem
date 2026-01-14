@@ -1,5 +1,6 @@
 # backend/api/core/auth.py
 import logging
+import hashlib
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -32,34 +33,42 @@ settings = get_settings()
 PEPPER = getattr(settings, "PEPPER", "")
 
 bearer_scheme = HTTPBearer()
-
 repo = UserRepository()
 
 # -------------------------------------------------
 # Passlib
 # -------------------------------------------------
 pwd_context = CryptContext(
-    schemes=["bcrypt"],
+    schemes=["argon2"],
     deprecated="auto",
 )
+
+# -------------------------------------------------
+# Helpers
+# -------------------------------------------------
+def _pre_hash_password(password: str) -> str:
+    """
+    Aplica SHA-256 em (senha + pepper) para evitar limites
+    """
+    combined = f"{password}{PEPPER}".encode("utf-8")
+    return hashlib.sha256(combined).hexdigest()
 
 # -------------------
 # Hash de senha
 # -------------------
 def hash_password(password: str) -> str:
     """
-    Gera hash seguro da senha usando bcrypt + pepper
+    Gera hash seguro da senha (SHA-256 + Argon2)
     """
-    pwd_peppered = password + PEPPER
-    return pwd_context.hash(pwd_peppered)
-
+    pre_hash = _pre_hash_password(password)
+    return pwd_context.hash(pre_hash)
 
 def verify_password(password: str, hashed: str) -> bool:
     """
-    Verifica senha usando bcrypt + pepper
+    Verifica senha usando SHA-256 + Argon2
     """
-    pwd_peppered = password + PEPPER
-    return pwd_context.verify(pwd_peppered, hashed)
+    pre_hash = _pre_hash_password(password)
+    return pwd_context.verify(pre_hash, hashed)
 
 # -------------------
 # Access Token (JWT)
@@ -68,9 +77,6 @@ def create_access_token(
     data: dict,
     expires_delta: Optional[timedelta] = None,
 ) -> str:
-    """
-    Cria JWT de acesso
-    """
     to_encode = data.copy()
 
     expire = datetime.utcnow() + (
@@ -87,11 +93,7 @@ def create_access_token(
         algorithm=settings.ALGORITHM,
     )
 
-
 def decode_access_token(token: str) -> Optional[dict]:
-    """
-    Decodifica e valida JWT de acesso
-    """
     try:
         return jwt.decode(
             token,

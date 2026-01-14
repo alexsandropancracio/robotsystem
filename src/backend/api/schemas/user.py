@@ -1,15 +1,16 @@
 # backend/api/schemas/user.py
-from pydantic import BaseModel, EmailStr, ConfigDict
 from datetime import datetime
-from pydantic import validator
 import re
+
+from pydantic import BaseModel, EmailStr, ConfigDict, field_validator
 
 # -------------------
 # Schemas base
 # -------------------
 class UserBase(BaseModel):
     email: EmailStr
-    full_name: str | None = None  # Opcional, caso queira armazenar nome completo
+    full_name: str | None = None
+
 
 # -------------------
 # Criação de usuário (input)
@@ -17,7 +18,8 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
-    @validator("password")
+    @field_validator("password")
+    @classmethod
     def password_strong(cls, v: str) -> str:
         if len(v) < 8:
             raise ValueError("Senha deve ter pelo menos 8 caracteres")
@@ -29,6 +31,7 @@ class UserCreate(UserBase):
             raise ValueError("Senha deve conter pelo menos um símbolo")
         return v
 
+
 # -------------------
 # Usuário para leitura (output)
 # -------------------
@@ -38,7 +41,8 @@ class UserRead(UserBase):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)  # SQLAlchemy -> Pydantic
+    model_config = ConfigDict(from_attributes=True)
+
 
 # -------------------
 # Login de usuário (input)
@@ -46,6 +50,7 @@ class UserRead(UserBase):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
 
 # -------------------
 # Token (output de login / refresh)

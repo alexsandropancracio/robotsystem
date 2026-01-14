@@ -42,3 +42,97 @@ dois tokens → só o último funciona
 Testes são para confiar ❞
 
 Depois que a pessoa sente esse poder, não volta mais pra vida sem testes 😂
+
+📦 Instalação (normalmente já está no seu venv)
+pip install pytest-cov
+
+
+No seu output eu vi:
+
+plugins: anyio, cov
+
+
+➡️ Isso significa que já está instalado e ativo ✅
+
+🔍 Esse comando que você citou
+pytest --cov=backend/api --cov-report=term-missing
+
+
+Vamos traduzir isso linha por linha 👇
+
+--cov=backend/api
+
+📌 Diz:
+
+“Quero medir a cobertura somente desse pacote”
+
+Ou seja:
+
+Só analisa código dentro de backend/api
+
+Ignora testes, configs, scripts etc.
+
+💡 Boa prática total.
+
+--cov-report=term-missing
+
+📌 Diz:
+
+“Mostra o relatório no terminal e me diga quais linhas NÃO foram cobertas”
+
+Exemplo de saída:
+
+Name                                      Stmts   Miss  Cover
+-------------------------------------------------------------
+backend/api/services/activation_token.py     45      3    93%
+                                  ↑       ↑       ↑
+                               total   não testadas
+
+
+E o mais importante 👇
+
+backend/api/services/activation_token.py:78-81
+
+
+➡️ Essas linhas nunca foram executadas por nenhum teste
+
+Isso é ouro 💎
+
+🧠 Por que coverage é tão poderoso?
+
+Porque ele responde perguntas como:
+
+🤔 “Esse if eu testei mesmo?”
+
+🤔 “Esse except roda em algum cenário?”
+
+🤔 “Tem código morto aqui?”
+
+E você para de:
+❌ debugar só por log
+❌ confiar no “acho que funciona”
+
+E começa a:
+✅ provar comportamento
+✅ enxergar lacunas
+✅ refinar regras de negócio
+
+pytest src/backend/tests --cov=src/backend/api --cov-report=term-missing
+
+E o sistema te respondeu:
+
+✅ O que funciona
+
+❌ O que NÃO está coberto
+
+📍 Exatamente a linha que nunca foi executada
+
+📊 Um mapa completo do seu backend
+
+Isso não é só teste, isso é:
+
+raio-X do sistema
+
+Um tech lead olha isso e pensa:
+
+“Esse cara testa regra de negócio.”

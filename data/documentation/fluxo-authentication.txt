@@ -51,3 +51,11 @@ backend/tests/test_activation_token_service.py::test_cannot_activate_with_expire
 ✅ O serviço funciona sem depender de endpoint
 
 Implementei o fluxo de ativação de conta com tokens temporários e escrevi testes unitários cobrindo expiração, reutilização, tentativas inválidas e regras de domínio.
+
+Mock do serviço de e-mail nos testes
+
+Testar se o e-mail seria enviado, não enviar de verdade
+
+💡 Exemplo:
+
+mock_mail_service.assert_called_once()
