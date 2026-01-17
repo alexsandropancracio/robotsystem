@@ -4,12 +4,12 @@ import sys
 from pathlib import Path
 from logging.config import fileConfig
 
-from dotenv import load_dotenv
-from sqlalchemy import create_engine, pool
 from alembic import context
+from sqlalchemy import create_engine, pool
+from dotenv import load_dotenv
 
 # -------------------------------
-# BASE_DIR e sys.path
+# BASE_DIR e sys.path (PRIMEIRO)
 # -------------------------------
 BASE_DIR = Path(__file__).resolve().parents[1]
 sys.path.append(str(BASE_DIR))
@@ -18,8 +18,16 @@ sys.path.append(str(BASE_DIR))
 # Imports do projeto
 # -------------------------------
 from backend.api.database.base import Base
-from backend.api.models import *  # noqa: F401,F403
 from backend.api.core.config import get_settings
+
+# IMPORTA OS MODELS AQUI 👇 (EXPLÍCITO)
+from backend.api.models.user import User
+from backend.api.models.license import License
+from backend.api.models.refresh_token import RefreshToken
+from backend.api.models.activation_token import ActivationToken
+
+# Metadata que Alembic vai usar
+target_metadata = Base.metadata
 
 # -------------------------------
 # Escolher o .env correto
@@ -51,9 +59,6 @@ if config.config_file_name:
 
 settings = get_settings()
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
-
-# Metadata que Alembic vai usar
-target_metadata = Base.metadata
 
 # -------------------------------
 # Função de migração offline

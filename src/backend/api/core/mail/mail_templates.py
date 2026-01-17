@@ -8,7 +8,7 @@ def activation_email_template(
     *,
     user_email: str,
     activation_token: str,
-    app_name: str = "RobotSystem",
+    app_name: str = "robotsystem",
     expires_in_minutes: int | None = None,
 ) -> Tuple[str, str, str]:
     """
@@ -26,7 +26,7 @@ def activation_email_template(
     text_body = f"""
 Olá,
 
-Você criou uma conta no {app_name} usando o e-mail {user_email}.
+Você criou uma conta na {app_name} usando o e-mail {user_email}.
 
 Para ativar sua conta, utilize o código abaixo:
 

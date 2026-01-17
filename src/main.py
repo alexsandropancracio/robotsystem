@@ -1,11 +1,9 @@
 from pathlib import Path
 import webview
-
 from app.api_window import WindowAPI
 from app.api_services import ServicesAPI
 from app.api import API
 from app.logging_config import logger
-
 
 def init(window):
     window.maximize()
@@ -36,7 +34,7 @@ def main():
         height=700,
         resizable=True,
         fullscreen=False,
-        js_api=api  # 👈 agora funciona
+        js_api=api
     )
 
     # 🔁 Injeta a janela nas APIs (depois de criada)
@@ -54,7 +52,6 @@ def main():
         debug=True,
         http_server=True
     )
-
 
 if __name__ == "__main__":
     logger.debug("🔥 Iniciando robotsystem pelo main.py")

@@ -4,10 +4,8 @@ from backend.api.core.config import get_settings
 
 settings = get_settings()
 
-
 class MailService:
-
-    def __init__(self, client: MailClient):
+    def __init__(self, client):
         self.client = client
 
     def send_activation_email(
@@ -16,10 +14,10 @@ class MailService:
         token: str,
         expires_in_minutes: int | None = None,
     ) -> None:
-
         subject, text, html = activation_email_template(
             user_email=email,
             activation_token=token,
+            expires_in_minutes=expires_in_minutes,
         )
 
         self.client.send_email(
