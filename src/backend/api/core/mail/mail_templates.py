@@ -85,3 +85,98 @@ Se você não solicitou este cadastro, ignore este e-mail.
 """.strip()
 
     return subject, text_body, html_body
+
+# -------------------------------------------------
+# Template de e-mail de recuperação de senha
+# -------------------------------------------------
+def password_reset_email_template(
+    *,
+    user_email: str,
+    reset_token: str,
+    app_name: str = "robotsystem",
+    expires_in_minutes: int | None = None,
+) -> Tuple[str, str, str]:
+    """
+    Gera o template de e-mail para recuperação de senha.
+
+    Retorna:
+        subject (str)
+        text_body (str)
+        html_body (str)
+    """
+    expires_minutes = expires_in_minutes or 30
+
+    subject = f"Recuperação de senha - {app_name}"
+
+    text_body = f"""
+Olá,
+
+Recebemos uma solicitação para redefinir a senha da sua conta no {app_name},
+associada ao e-mail {user_email}.
+
+Para redefinir sua senha, utilize o token abaixo:
+
+Token de recuperação: {reset_token}
+
+Este token expira em {expires_minutes} minutos.
+
+Se você não solicitou a redefinição de senha, ignore este e-mail.
+Sua conta permanecerá segura.
+
+— Equipe {app_name}
+""".strip()
+
+    html_body = f"""
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{subject}</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 24px; border-radius: 8px;">
+        <h2 style="color: #333333;">Recuperação de senha</h2>
+
+        <p>Olá,</p>
+
+        <p>
+            Recebemos uma solicitação para redefinir a senha da sua conta no
+            <strong>{app_name}</strong>, associada ao e-mail
+            <strong>{user_email}</strong>.
+        </p>
+
+        <p>Utilize o token abaixo para continuar:</p>
+
+        <div style="
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-align: center;
+            padding: 16px;
+            background-color: #f0f0f0;
+            border-radius: 6px;
+            margin: 20px 0;
+            word-break: break-all;
+        ">
+            {reset_token}
+        </div>
+
+        <p style="color: #777777; font-size: 14px;">
+            Este token expira em {expires_minutes} minutos.
+        </p>
+
+        <p style="color: #777777; font-size: 14px;">
+            Se você não solicitou a redefinição de senha, ignore este e-mail.
+        </p>
+
+        <hr style="margin: 24px 0;">
+
+        <p style="font-size: 12px; color: #999999;">
+            © {app_name}
+        </p>
+    </div>
+</body>
+</html>
+""".strip()
+
+    return subject, text_body, html_body

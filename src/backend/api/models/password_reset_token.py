@@ -1,4 +1,5 @@
-from datetime import datetime
+#backend/api/models/password_reset_token.py
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -21,7 +22,7 @@ class PasswordResetToken(Base):
         nullable=False,
     )
 
-    token: Mapped[str] = mapped_column(
+    hashed_token: Mapped[str] = mapped_column(
         String(255),
         unique=True,
         index=True,
@@ -48,3 +49,12 @@ class PasswordResetToken(Base):
         "User",
         back_populates="password_reset_tokens",
     )
+
+    def is_expired(self) -> bool:
+        return self.expires_at < datetime.now(timezone.utc)
+
+    def is_used(self) -> bool:
+        return self.used_at is not None
+
+    def mark_as_used(self) -> None:
+        self.used_at = datetime.now(timezone.utc)

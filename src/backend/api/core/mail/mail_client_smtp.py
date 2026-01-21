@@ -1,49 +1,78 @@
 import smtplib
-from email.mime.multipart import MIMEMultipart
+import ssl
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from typing import Optional
+
+from backend.api.core.mail.mail_client import MailClient
 from backend.api.core.config import get_settings
 
-settings = get_settings()
 
-class MailClientSMTP:
+class MailClientSMTP(MailClient):
     """
-    Cliente SMTP para envio de e-mails.
-    Funciona com Gmail, Outlook e outros provedores que usam SMTP.
+    Cliente SMTP para envio de e-mails via servidor configurado.
+    Implementa o contrato definido em MailClient.
     """
-    settings = get_settings()
 
+    def __init__(self) -> None:
+        self.settings = get_settings()
 
+        if not self.settings.SMTP_ENABLED:
+            raise RuntimeError("SMTP está desabilitado nas configurações")
 
-    def __init__(self):
-        if not settings.SMTP_ENABLED:
+        required_settings = [
+            self.settings.MAIL_HOST,
+            self.settings.MAIL_PORT,
+            self.settings.MAIL_FROM,
+            self.settings.MAIL_USERNAME,
+            self.settings.MAIL_PASSWORD,
+        ]
+
+        if not all(required_settings):
             raise RuntimeError("Configuração SMTP incompleta")
 
-        self.host = settings.MAIL_HOST
-        self.port = settings.MAIL_PORT
-        self.username = settings.MAIL_USERNAME
-        self.password = settings.MAIL_PASSWORD
-        self.from_email = settings.MAIL_FROM
-        self.use_tls = settings.MAIL_USE_TLS
-
-    def send_email(self, to: str, subject: str, text: str, html: str = None) -> None:
-        # Monta a mensagem
+    def send(
+        self,
+        to: str,
+        subject: str,
+        html_body: str,
+        text_body: Optional[str] = None,
+    ) -> None:
         msg = MIMEMultipart("alternative")
-        msg["From"] = settings.MAIL_FROM
+        msg["From"] = self.settings.MAIL_FROM
         msg["To"] = to
         msg["Subject"] = subject
 
-        # Texto plano
-        part_text = MIMEText(text, "plain")
-        msg.attach(part_text)
+        # Fallback texto puro (opcional)
+        if text_body:
+            msg.attach(MIMEText(text_body, "plain", "utf-8"))
 
-        # HTML (opcional)
-        if html:
-            part_html = MIMEText(html, "html")
-            msg.attach(part_html)
+        # Corpo principal HTML
+        msg.attach(MIMEText(html_body, "html", "utf-8"))
 
-        # Conexão SMTP
-        with smtplib.SMTP(self.host, self.port) as server:
-            if self.use_tls:
-                server.starttls()
-            server.login(self.username, self.password)
-            server.sendmail(self.username, to, msg.as_string())
+        try:
+            with smtplib.SMTP(
+                host=self.settings.MAIL_HOST,
+                port=self.settings.MAIL_PORT,
+                timeout=10,
+            ) as server:
+
+                if self.settings.MAIL_USE_TLS:
+                    context = ssl.create_default_context()
+                    server.starttls(context=context)
+
+                server.login(
+                    self.settings.MAIL_USERNAME,
+                    self.settings.MAIL_PASSWORD,
+                )
+
+                server.sendmail(
+                    self.settings.MAIL_FROM,
+                    [to],
+                    msg.as_string(),
+                )
+
+        except smtplib.SMTPException as exc:
+            raise RuntimeError(
+                f"Erro ao enviar e-mail via SMTP: {exc}"
+            ) from exc

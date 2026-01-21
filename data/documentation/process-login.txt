@@ -460,3 +460,35 @@ password reset
 MFA futuramente
 
 📌 Esse é o padrão de sistemas profissionais.
+
+📁 Arquivos envolvidos (check mental)
+Camada	Arquivo
+Route	routes/auth.py
+Schema	schemas/password_reset.py
+Service	services/password_reset_service.py
+Security	core/auth.py + core/security/token.py
+
+PasswordResetService
+ └── gera token
+ └── salva no banco
+ └── chama MailService
+
+MailService
+ └── escolhe template
+ └── chama MailClient (mock ou smtp)
+
+MailClient
+ ├── Mock (teste)
+ └── SMTP (produção)
+
+Aqui você vira engenheiro de produto, não só dev:
+
+Teste do endpoint /request
+
+Teste do endpoint /confirm
+
+Teste de token inválido
+
+Teste de token expirado
+
+Teste de senhas diferentes

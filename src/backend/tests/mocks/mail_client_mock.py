@@ -1,6 +1,9 @@
+from typing import List, Dict
+
+
 class MailClientMock:
     def __init__(self):
-        self.sent_emails = []
+        self.sent_emails: List[Dict[str, str]] = []
 
     def send_email(
         self,
@@ -18,3 +21,19 @@ class MailClientMock:
                 "html": html,
             }
         )
+
+    # ----------------------------------------
+    # Helpers para testes
+    # ----------------------------------------
+    def clear(self) -> None:
+        self.sent_emails.clear()
+
+    @property
+    def last_email(self) -> dict | None:
+        if not self.sent_emails:
+            return None
+        return self.sent_emails[-1]
+
+    @property
+    def count(self) -> int:
+        return len(self.sent_emails)

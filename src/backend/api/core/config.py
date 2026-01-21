@@ -82,7 +82,9 @@ class Settings(BaseSettings):
     MAIL_USERNAME: str | None = None
     MAIL_PASSWORD: str | None = None
     MAIL_FROM: str | None = None
+
     MAIL_USE_TLS: bool = True
+    MAIL_USE_SSL: bool = False
 
     # =================================================
     # PROPERTIES
@@ -128,3 +130,8 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+# -------------------------------------------------
+# Instância global (usada via import)
+# -------------------------------------------------
+settings = get_settings()

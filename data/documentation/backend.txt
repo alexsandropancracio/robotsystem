@@ -1,0 +1,28 @@
+backend/
+└── api/
+    ├── routers/        ← ENDPOINTS (HTTP)
+    ├── schemas/        ← Pydantic (entrada/saída)
+    ├── services/       ← Regra de negócio
+    ├── models/         ← ORM (SQLAlchemy)
+
+Importante (visão arquitetural)
+
+✔ Schema → valida formato e regras básicas
+
+✔ Service → valida token, expiração, persiste
+
+✔ Core/auth → hash de senha
+
+✔ Core/security/token → hash de token
+
+Migração futura (quando quiser)
+
+Você só vai:
+
+Trocar Session → AsyncSession
+
+Trocar def → async def
+
+Trocar .query() → select()
+
+Adicionar await

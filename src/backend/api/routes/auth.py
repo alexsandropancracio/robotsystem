@@ -18,6 +18,12 @@ from backend.api.core.exceptions import (
     InvalidCredentialsError,
     InvalidActivationTokenError,
 )
+from backend.api.schemas.password_reset import (
+    PasswordResetRequest,
+    PasswordResetConfirm,
+)
+from backend.api.services.password_reset_service import PasswordResetService
+
 
 router = APIRouter(
     prefix="/auth",
@@ -155,4 +161,60 @@ def send_activation(
         "message": "Código de ativação enviado com sucesso",
         # ⚠️ DEV ONLY — remover quando o envio de e-mail estiver ativo
         "activation_token": token,
+    }
+
+# -------------------------------------------------
+# PASSWORD RESET — REQUEST
+# -------------------------------------------------
+@router.post(
+    "/password-reset/request",
+    status_code=status.HTTP_200_OK,
+)
+def request_password_reset(
+    data: PasswordResetRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Solicita redefinição de senha.
+    Sempre retorna sucesso (anti-enumeração).
+    """
+    PasswordResetService.request_reset(
+        db=db,
+        email=data.email,
+    )
+
+    return {
+        "message": "Se o e-mail existir, um código de redefinição foi enviado"
+    }
+
+# -------------------------------------------------
+# PASSWORD RESET — CONFIRM
+# -------------------------------------------------
+@router.post(
+    "/password-reset/confirm",
+    status_code=status.HTTP_200_OK,
+)
+def confirm_password_reset(
+    data: PasswordResetConfirm,
+    db: Session = Depends(get_db),
+):
+    """
+    Confirma redefinição de senha usando token.
+    """
+    try:
+        PasswordResetService.reset_password(
+            db=db,
+            token=data.token,
+            new_password=data.new_password,
+            confirm_password=data.confirm_password,
+        )
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+    return {
+        "message": "Senha redefinida com sucesso"
     }
