@@ -34,8 +34,6 @@ class ActivateAccountRequest(BaseModel):
     email: EmailStr
     token: str = Field(
         ...,
-        min_length=6,
-        max_length=6,
         description="Código de ativação de 6 dígitos",
         examples=["123456"],
     )

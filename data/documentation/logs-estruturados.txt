@@ -1,0 +1,338 @@
+🧠 O que são logs estruturados?
+📌 Definição simples
+
+Logs estruturados são logs que não são texto solto, mas sim dados organizados em campos, normalmente em formato JSON.
+
+👉 Em vez disso ❌ (log comum / ruim):
+
+Erro ao enviar email para usuário
+
+
+👉 Fazemos isso ✅ (log estruturado):
+
+{
+  "level": "error",
+  "event": "email_send_failed",
+  "user_email": "alex@email.com",
+  "service": "activation_token",
+  "error": "SMTPAuthenticationError"
+}
+
+🤔 Por que logs “normais” não são suficientes?
+
+Logs soltos:
+
+difíceis de filtrar
+
+difíceis de buscar
+
+impossíveis de analisar automaticamente
+
+ruins para produção
+
+📌 Exemplo real:
+
+“Quais usuários tiveram falha ao receber e-mail hoje?”
+
+❌ Com texto solto → impossível
+✅ Com logs estruturados → trivial
+
+🧩 O que um log estruturado normalmente contém?
+
+Campos comuns (padrão profissional):
+
+Campo	O que significa
+level	info / warning / error
+event	nome curto do que aconteceu
+service	qual serviço gerou o log
+endpoint	rota da API
+user_id	se houver
+email	se houver
+ip	se houver
+error	mensagem de erro
+timestamp	quando aconteceu
+🔒 Segurança: o que NÃO logar
+
+Muito importante ⚠️
+
+❌ NUNCA logar:
+
+senha
+
+token de ativação
+
+token JWT
+
+refresh token
+
+código enviado por e-mail
+
+📌 Regra de ouro:
+
+Logue contexto, não segredo
+
+🧠 Onde logs estruturados entram no seu projeto?
+
+No RobotSystem, eles entram principalmente em:
+
+🔐 Auth (login, activation, reset)
+
+📧 Envio de e-mail
+
+🚫 Rate limit
+
+❌ Exceções
+
+🔍 Auditoria básica
+
+Exemplo real do seu fluxo atual:
+
+📍 /auth/send-activation
+
+Logs ideais:
+
+1️⃣ Tentativa de envio
+2️⃣ Bloqueio por rate limit
+3️⃣ Falha no SMTP
+4️⃣ Sucesso no envio
+
+Tudo isso sem nunca mostrar o token.
+
+🧠 Exemplo mental aplicado ao seu endpoint
+
+Quando alguém chama:
+
+POST /auth/send-activation
+
+
+O sistema deveria gerar logs como:
+
+{
+  "level": "info",
+  "event": "activation_email_requested",
+  "email": "user@email.com",
+  "ip": "187.xxx.xxx.xxx"
+}
+
+
+Se bater no rate limit:
+
+{
+  "level": "warning",
+  "event": "rate_limit_exceeded",
+  "endpoint": "/auth/send-activation",
+  "ip": "187.xxx.xxx.xxx.xxx"
+}
+
+
+Se SMTP falhar:
+
+{
+  "level": "error",
+  "event": "activation_email_send_failed",
+  "email": "user@email.com",
+  "error": "SMTPAuthenticationError"
+}
+
+🚀 Por que isso é nível profissional?
+
+Logs estruturados permitem:
+
+integração com ELK (Elastic)
+
+Datadog
+
+Grafana Loki
+
+CloudWatch
+
+alertas automáticos
+
+auditoria
+
+debug rápido em produção
+
+📌 Empresas grandes não debuggam com print.
+
+🔁 Resumo em uma frase
+
+Logs estruturados são logs pensados para máquinas e humanos analisarem, não apenas para “ver no terminal”.
+
+❌ Logs estruturados NÃO são só para endpoints
+
+Endpoints são apenas um dos lugares onde logs estruturados fazem sentido.
+
+👉 Pense assim:
+
+Logs estruturados servem para observar o comportamento do sistema inteiro, não só da API.
+
+🧠 Onde logs estruturados DEVEM existir?
+1️⃣ Endpoints (camada de entrada)
+
+Sim, aqui eles são importantes, porque:
+
+você sabe quem chamou
+
+quando
+
+qual rota
+
+qual IP
+
+qual status
+
+📌 Exemplo:
+
+{
+  "event": "request_received",
+  "endpoint": "/auth/send-activation",
+  "method": "POST",
+  "ip": "187.xxx.xxx.xxx"
+}
+
+2️⃣ Services (camada de negócio) ⭐️⭐️⭐️
+
+Aqui é o coração do sistema.
+
+É onde você registra:
+
+regras de negócio
+
+decisões importantes
+
+fluxos críticos
+
+falhas reais
+
+📌 Exemplo no ActivationTokenService:
+
+{
+  "event": "activation_token_created",
+  "user_id": 42,
+  "expires_in_minutes": 15
+}
+
+
+📌 Ou erro:
+
+{
+  "event": "activation_token_creation_failed",
+  "user_id": 42,
+  "reason": "user_already_active"
+}
+
+3️⃣ Repositories (com MUITO cuidado)
+
+Aqui os logs são:
+
+raros
+
+bem pontuais
+
+geralmente erros inesperados
+
+❌ Não logamos:
+
+queries normais
+
+fluxo esperado
+
+✅ Logamos:
+
+falhas de integridade
+
+erros de banco
+
+estados impossíveis
+
+📌 Exemplo:
+
+{
+  "event": "database_constraint_error",
+  "table": "activation_tokens",
+  "error": "foreign_key_violation"
+}
+
+4️⃣ Infra / Integrações externas (SMTP, APIs)
+
+Essencial 🔥
+
+SMTP, por exemplo:
+
+é instável
+
+falha por credencial
+
+falha por rede
+
+falha por spam
+
+📌 Exemplo:
+
+{
+  "event": "smtp_send_failed",
+  "provider": "smtp.gmail.com",
+  "error": "AuthenticationError"
+}
+
+5️⃣ Segurança (auth, rate limit, tentativas suspeitas)
+
+Aqui logs são quase auditoria.
+
+📌 Exemplo:
+
+{
+  "event": "rate_limit_exceeded",
+  "endpoint": "/auth/send-activation",
+  "ip": "187.xxx.xxx.xxx"
+}
+
+
+📌 Ou:
+
+{
+  "event": "invalid_activation_token_attempt",
+  "email": "user@email.com"
+}
+
+🔥 O erro comum (que você está evitando 👏)
+
+❌ Pensar:
+
+“log é só pra request e response”
+
+Isso vira:
+
+logs inúteis
+
+ruído
+
+nenhum insight real
+
+🧠 Regra mental simples (anota essa)
+
+Toda decisão importante do sistema merece um log.
+
+Se o sistema:
+
+decide negar algo
+
+gera algo
+
+envia algo
+
+falha em algo
+
+protege algo
+
+👉 isso merece um log.
+
+🧩 No seu projeto RobotSystem, logs entram em:
+Camada	Usa logs estruturados?
+
+routes/	        ✅
+services/	✅ (principal)
+repositories/	⚠️ raramente
+core/mail/	✅
+core/security/	✅
+rate limit	✅

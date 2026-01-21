@@ -1,15 +1,16 @@
-# backend/api/repositories/activation_token_repository.py
 from datetime import datetime
+from typing import Optional
 from sqlalchemy.orm import Session
-
 from backend.api.models.activation_token import ActivationToken
-
 
 class ActivationTokenRepository:
 
     def __init__(self, db: Session):
         self.db = db
 
+    # -------------------------------------------------
+    # CREATE
+    # -------------------------------------------------
     def create(
         self,
         *,
@@ -26,11 +27,18 @@ class ActivationTokenRepository:
         self.db.add(activation_token)
         return activation_token
 
+    # -------------------------------------------------
+    # READ
+    # -------------------------------------------------
     def get_active_token_for_user(
         self,
         *,
         user_id: int,
-    ) -> ActivationToken | None:
+    ) -> Optional[ActivationToken]:
+        """
+        Retorna o token ativo mais recente do usuário,
+        considerando não usado e não expirado (UTC).
+        """
         return (
             self.db.query(ActivationToken)
             .filter(
@@ -42,7 +50,17 @@ class ActivationTokenRepository:
             .first()
         )
 
-    def invalidate_all_for_user(self, *, user_id: int) -> None:
+    # -------------------------------------------------
+    # UPDATE
+    # -------------------------------------------------
+    def invalidate_all_for_user(
+        self,
+        *,
+        user_id: int,
+    ) -> None:
+        """
+        Marca todos os tokens não usados do usuário como usados.
+        """
         (
             self.db.query(ActivationToken)
             .filter(

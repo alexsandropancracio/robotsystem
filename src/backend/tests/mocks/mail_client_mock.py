@@ -1,24 +1,35 @@
+import re
 from typing import List, Dict
 
 
 class MailClientMock:
     def __init__(self):
-        self.sent_emails: List[Dict[str, str]] = []
+        self.sent_emails: List[Dict[str, str | None]] = []
 
-    def send_email(
+    def send(
         self,
         *,
         to: str,
         subject: str,
-        text: str,
-        html: str,
+        html_body: str,
+        text_body: str,
     ) -> None:
+        """
+        Mock do cliente de e-mail.
+        Captura o conteúdo enviado e extrai automaticamente
+        tokens numéricos de 6 dígitos (ativação / reset).
+        """
+
+        match = re.search(r"\b\d{6}\b", text_body)
+        token = match.group() if match else None
+
         self.sent_emails.append(
             {
                 "to": to,
                 "subject": subject,
-                "text": text,
-                "html": html,
+                "html": html_body,
+                "text": text_body,
+                "token": token,  # 👈 token extraído para uso nos testes
             }
         )
 

@@ -36,7 +36,7 @@ def upgrade() -> None:
     op.create_table('activation_tokens',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('token', sa.String(length=6), nullable=False),
+    sa.Column('token', sa.String(length=255), nullable=False),
     sa.Column('is_used', sa.Boolean(), server_default=sa.text('false'), nullable=False),
     sa.Column('expires_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),

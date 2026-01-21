@@ -1,3 +1,30 @@
+Gero token curto (6 dígitos)
+
+Envio token puro por e-mail
+
+Salvo hash do token no banco
+
+Nunca salvo token em texto puro
+
+Token tem:
+
+expiração
+
+flag is_used
+
+Na validação:
+
+busco token ativo
+
+verifico expiração
+
+comparo via hash
+
+Ativo usuário + invalido token
+
+Commit atômico (ou rollback)
+
+
 O user_service está fazendo papel demais.
 O auth_service nasce para dividir essa responsabilidade.
 

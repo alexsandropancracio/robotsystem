@@ -3,6 +3,7 @@ from backend.api.core.mail.mail_templates import (
     password_reset_email_template,
 )
 from backend.api.core.mail.mail_client import MailClient
+from backend.api.core.mail.mail_client_smtp import MailClientSMTP
 from backend.api.core.config import settings
 
 
@@ -59,11 +60,5 @@ class MailService:
 # DEPENDENCY PROVIDER (FastAPI)
 # -------------------------------------------------
 def get_mail_service() -> MailService:
-    client = MailClient(
-        host=settings.SMTP_HOST,
-        port=settings.SMTP_PORT,
-        username=settings.SMTP_USER,
-        password=settings.SMTP_PASSWORD,
-        use_tls=settings.SMTP_USE_TLS,
-    )
+    client = MailClientSMTP()
     return MailService(client=client)

@@ -136,3 +136,11 @@ raio-X do sistema
 Um tech lead olha isso e pensa:
 
 “Esse cara testa regra de negócio.”
+
+💡 Resumo do plano profissional:
+
+Unitário: testar serviços isolados (já está feito em services/)
+
+Integração: endpoint + db + serviço de e-mail mockado (novo teste a criar)
+
+E2E: fluxo completo do usuário, simulando envio de e-mail e ativação (próxima etapa)
