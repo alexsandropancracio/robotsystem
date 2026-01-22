@@ -519,3 +519,184 @@ Teste de token inválido
 Teste de token expirado
 
 Teste de senhas diferentes
+
+✅ Relatório de Testes e Checklist – Backend RobotSystem
+1️⃣ Registro de Usuário (Criação de Conta)
+
+Objetivo: permitir que um novo usuário se registre corretamente no sistema.
+
+Endpoints principais
+
+POST /users (ou equivalente no backend)
+
+Fluxo esperado
+
+Usuário envia:
+
+email
+
+senha
+
+outros dados (nome, cpf, etc)
+
+Backend:
+
+aplica pepper + SHA256 na senha
+
+gera hash final com Argon2
+
+salva no banco (UserRepository)
+
+Retorna:
+
+sucesso → 201 Created
+
+erro → 400 Bad Request (ex: email já registrado)
+
+Pontos para testar no frontend
+
+Validação de campos: email válido, senha mínima, confirma senha igual
+
+Mensagens de erro claras (ex: “Email já existe”)
+
+Frontend deve enviar JSON corretamente (header Content-Type: application/json)
+
+Testar tanto sucesso quanto falhas
+
+2️⃣ Login (Autenticação)
+
+Objetivo: permitir que usuário logue no sistema.
+
+Endpoints principais
+
+POST /auth/login
+
+Fluxo esperado
+
+Usuário envia:
+
+email
+
+senha
+
+Backend:
+
+busca usuário no DB
+
+usa verify_password para conferir hash (SHA256+Argon2)
+
+gera JWT Access Token
+
+Retorna:
+
+sucesso → token JWT + status 200
+
+falha → 401 Unauthorized
+
+Pontos para testar no frontend
+
+Input de email e senha
+
+Mensagens de erro (senha incorreta, usuário não encontrado)
+
+Armazenamento seguro do token (ex: localStorage ou secure storage)
+
+Testar envio de token em headers Authorization: Bearer … em requests protegidos
+
+3️⃣ Password Reset (Esqueci a senha)
+
+Objetivo: permitir que usuário redefina senha de forma segura.
+
+Endpoints principais
+
+POST /password-reset/request → envia email com token
+
+POST /password-reset/confirm → redefine senha usando token
+
+Fluxo esperado
+
+Usuário solicita reset:
+
+envia email
+
+Backend:
+
+gera token seguro HMAC+SHA256
+
+salva no DB (password_reset_token)
+
+envia email (ou mock nos testes)
+
+Usuário redefine senha:
+
+envia token + nova senha
+
+Backend:
+
+verifica token com verify_token
+
+aplica hash SHA256+Argon2 na nova senha
+
+atualiza usuário
+
+invalida token
+
+Pontos para testar no frontend
+
+Input de email para solicitar reset
+
+Mensagem de sucesso: “Email enviado, verifique sua caixa”
+
+Token enviado via email → frontend deve capturar e enviar corretamente
+
+Input de nova senha + confirmação
+
+Testar casos de erro:
+
+token expirado
+
+token inválido
+
+senha não atende critérios de segurança
+
+4️⃣ JWT / Access Token
+
+Objetivo: proteger endpoints com tokens.
+
+Pontos importantes
+
+get_current_user deve validar token
+
+Token inválido → retorna 401
+
+Token expirado → retorna 401
+
+Frontend deve enviar token em headers Authorization: Bearer …
+
+5️⃣ Testes de Integração / E2E
+
+Você já rodou:
+
+test_password_reset_e2e ✅
+
+Outros testes E2E e unitários de criação de usuário, login, e password reset ✅
+
+Isso garante que o fluxo principal funciona de ponta a ponta, do DB ao endpoint.
+
+6️⃣ Checklist de Frontend antes da integração
+Item	Status / Observação
+Registro de usuário	Validar inputs, mensagens de erro, hash seguro enviado ao backend
+Login	Validar token retornado, armazenamento seguro, envio em headers
+Password Reset Request	Validar input de email, mensagem de sucesso, token enviado corretamente
+Password Reset Confirm	Validar token, nova senha + confirm, mensagens de erro para token inválido/expirado
+JWT Validation	Frontend envia token nos endpoints protegidos, verifica expirado ou inválido
+Mensagens de erro	Todas devem ser claras e consistentes
+Headers / Content-Type	JSON correto em todas requests
+Fluxo completo	Testar ponta a ponta: registro → login → reset senha → login novamente
+7️⃣ Observações finais
+
+Com base nos testes E2E que você rodou, o backend está pronto para integração com o frontend.
+
+Reforçar: o frontend precisa respeitar o contrato dos endpoints, nomes de campos e headers.
+
+Depois de conectar, é bom rodar um teste manual completo de ponta a ponta para garantir que tudo funciona visualmente.

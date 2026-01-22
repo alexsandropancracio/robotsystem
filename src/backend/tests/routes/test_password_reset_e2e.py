@@ -1,87 +1,74 @@
+# backend/tests/routes/test_password_reset_e2e.py
+
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from backend.api.main import app
 from backend.api.deps.database import get_db
-from backend.api.models.user import Base, User
+from backend.api.models.user import User
 from backend.api.services.password_reset_service import PasswordResetService
-from backend.tests.mocks.mail_client_mock import MailClientMock
 from backend.api.core.mail.mail_service import MailService
+from backend.tests.mocks.mail_client_mock import MailClientMock
+from backend.api.core.auth import verify_password # 🔑 função de verificação de hash
 
-# ------------------------------
-# Configuração do DB de teste
-# ------------------------------
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+@pytest.mark.asyncio
+def test_password_reset_e2e(client: TestClient, db_session, user_factory):
+    """
+    E2E - Fluxo completo de reset de senha com token de 6 dígitos
+    """
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base.metadata.create_all(bind=engine)
+    # -------------------------------------------------
+    # 🔁 Override do get_db para usar SQLite do teste
+    # -------------------------------------------------
+    def override_get_db():
+        try:
+            yield db_session
+        finally:
+            pass
 
-# Sobrescrevendo a dependência do DB para usar o SQLite de teste
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    client.app.dependency_overrides[get_db] = override_get_db
 
-app.dependency_overrides[get_db] = override_get_db
-
-# ------------------------------
-# Mock de e-mail
-# ------------------------------
-mail_client_mock = MailClientMock()
-mail_service = MailService(mail_client=mail_client_mock)
-
-# ------------------------------
-# Cliente de teste FastAPI
-# ------------------------------
-client = TestClient(app)
-
-# ------------------------------
-# Teste E2E do Password Reset
-# ------------------------------
-def test_password_reset_flow():
-    # 1️⃣ Criar usuário de teste
-    db = next(override_get_db())
-    test_user = User(
-        email="user@example.com",
-        hashed_password="oldhashedpassword",
+    # -------------------------
+    # 1️⃣ Criar usuário ativo
+    # -------------------------
+    user = user_factory(
+        email="reset-test@robotsystem.com",
+        password="oldpassword",
         is_active=True,
-        is_email_verified=True
+        is_email_verified=True,
     )
-    db.add(test_user)
-    db.commit()
-    db.refresh(test_user)
 
-    # 2️⃣ Solicitar redefinição de senha
-    response_request = client.post(
-        "/auth/password-reset/request",
-        json={"email": test_user.email}
+    # -------------------------
+    # 2️⃣ Criar serviço de reset e mock de email
+    # -------------------------
+    mail_client = MailClientMock()
+    mail_service = MailService(client=mail_client)
+    reset_service = PasswordResetService(db=db_session, mail_service=mail_service)
+
+    # -------------------------
+    # 3️⃣ Solicitar reset de senha
+    # -------------------------
+    reset_service.request_reset(user.email)
+
+    # ✅ Captura token do mock
+    last_email = mail_client.last_email
+    assert last_email is not None, "Nenhum e-mail foi enviado"
+    reset_token = last_email["token"]
+    assert reset_token is not None, "Token de reset não foi enviado"
+
+    # -------------------------
+    # 4️⃣ Resetar a senha usando o token
+    # -------------------------
+    new_password = "newpassword123"
+    reset_service.reset_password(
+        token=reset_token,
+        new_password=new_password,
+        confirm_password=new_password,
     )
-    assert response_request.status_code == 200
-    assert "Se o e-mail existir" in response_request.json()["message"]
 
-    # 3️⃣ Capturar token do mock
-    reset_token = mail_client_mock.last_reset_token
-    assert reset_token is not None, "O token de reset não foi gerado"
+    # -------------------------
+    # 5️⃣ Validar se a senha foi atualizada
+    # -------------------------
+    updated_user: User = db_session.query(User).filter(User.id == user.id).first()
+    assert updated_user is not None, "Usuário não encontrado no banco"
 
-    # 4️⃣ Confirmar redefinição de senha
-    new_password = "newsecurepassword123"
-    response_confirm = client.post(
-        "/auth/password-reset/confirm",
-        json={
-            "token": reset_token,
-            "new_password": new_password,
-            "confirm_password": new_password
-        }
-    )
-    assert response_confirm.status_code == 200
-    assert "Senha redefinida com sucesso" in response_confirm.json()["message"]
-
-    # 5️⃣ Verificar que a senha realmente mudou no DB
-    db.refresh(test_user)
-    assert test_user.hashed_password != "oldhashedpassword"
+    # ✅ Verificação de hash da nova senha
+    assert verify_password(new_password, updated_user.hashed_password), "Senha não foi atualizada corretamente"

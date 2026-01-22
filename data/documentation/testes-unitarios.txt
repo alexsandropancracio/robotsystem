@@ -144,3 +144,15 @@ Unitário: testar serviços isolados (já está feito em services/)
 Integração: endpoint + db + serviço de e-mail mockado (novo teste a criar)
 
 E2E: fluxo completo do usuário, simulando envio de e-mail e ativação (próxima etapa)
+
+Ferramentas:
+
+pytest
+
+TestClient do FastAPI
+
+mail_client_mock
+
+user_factory para criar usuários de teste
+
+conftest.py para fixtures (DB + client)

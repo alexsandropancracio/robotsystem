@@ -1,0 +1,25 @@
+1️⃣ Request de reset (gera token + “envia” email)
+2️⃣ Verificar se o token foi criado no banco
+3️⃣ Confirmar reset (troca a senha)
+4️⃣ Validar que o token não pode ser reutilizado
+
+1️⃣ Teste de token inválido (mais simples)
+2️⃣ Teste de token expirado
+3️⃣ Teste de reenvio de token
+4️⃣ Depois pensar em rate limit e concorrência
+
+Tipo de teste	Esse teste cobre?
+Token expirado	✅ SIM
+Token inválido (número errado)	❌ NÃO
+Token reutilizado	❌ NÃO
+Token inexistente	❌ NÃO
+
+Testar casos de erro:
+
+Token inválido / adulterado
+
+Token expirado
+
+Usuário não encontrado
+
+Se você quiser, podemos rodar esse teste juntinho com os outros E2E (activation e tampered token) pra garantir que todo o sistema de autenticação está 100% coberto.

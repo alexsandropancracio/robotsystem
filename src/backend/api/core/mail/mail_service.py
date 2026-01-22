@@ -53,6 +53,7 @@ class MailService:
             subject=subject,
             html_body=html,
             text_body=text,
+            token=token
         )
 
 

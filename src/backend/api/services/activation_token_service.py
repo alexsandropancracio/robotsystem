@@ -51,6 +51,7 @@ class ActivationTokenService:
         """
         Cria um novo token de ativação e envia por e-mail.
         """
+        
 
         if user.is_active:
             raise InvalidActivationTokenError(
@@ -88,6 +89,8 @@ class ActivationTokenService:
             token=token,
             expires_in_minutes=TOKEN_EXPIRATION_MINUTES,
         )
+
+        return token
 
     # -------------------------------------------------
     # ACTIVATE (DOMÍNIO)

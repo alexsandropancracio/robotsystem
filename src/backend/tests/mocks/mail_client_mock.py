@@ -13,15 +13,16 @@ class MailClientMock:
         subject: str,
         html_body: str,
         text_body: str,
+        token: str | None = None,  # 👈 agora aceita token diretamente
     ) -> None:
         """
         Mock do cliente de e-mail.
-        Captura o conteúdo enviado e extrai automaticamente
-        tokens numéricos de 6 dígitos (ativação / reset).
+        Captura o conteúdo enviado e extrai automaticamente tokens numéricos de 6 dígitos (ativação / reset),
+        ou usa o token passado explicitamente.
         """
-
-        match = re.search(r"\b\d{6}\b", text_body)
-        token = match.group() if match else None
+        if not token:
+            match = re.search(r"token[:=]\s*([^\s]+)", text_body, re.IGNORECASE)
+            token = match.group(1) if match else None
 
         self.sent_emails.append(
             {
@@ -29,13 +30,10 @@ class MailClientMock:
                 "subject": subject,
                 "html": html_body,
                 "text": text_body,
-                "token": token,  # 👈 token extraído para uso nos testes
+                "token": token,  # 👈 token extraído ou passado diretamente
             }
         )
 
-    # ----------------------------------------
-    # Helpers para testes
-    # ----------------------------------------
     def clear(self) -> None:
         self.sent_emails.clear()
 

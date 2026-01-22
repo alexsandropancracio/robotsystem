@@ -61,7 +61,7 @@ class PasswordResetService:
             )
         )
 
-        raw_token = secrets.token_urlsafe(32)
+        raw_token = f"{secrets.randbelow(1000000):06d}"  # Gera 6 dígitos, com zeros à esquerda
 
         reset_token = PasswordResetToken(
             user_id=user.id,
