@@ -1,0 +1,252 @@
+/* ==========================================================
+   SEPARATOR PAGE (React)
+   ========================================================== */
+
+#separator {
+    width: 100%;
+    height: calc(100vh - 70px); /* compatível com o header fixo */
+    background: #050505;
+    color: #fff;
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+}
+
+/* ==========================================================
+   LAYOUT WRAPPERS
+   ========================================================== */
+
+#separator .separator-wrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#separator .separator-main {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#separator .separator-center {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+/* ==========================================================
+   TITULOS / TEXTOS
+   ========================================================== */
+
+#separator .separator-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    color: #fff;
+}
+
+#separator .separator-sub {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    max-width: 600px;
+}
+
+/* ==========================================================
+   CARD PRINCIPAL
+   ========================================================== */
+
+#separator .card-wrapper-separator {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+/* Rings decorativos */
+#separator .rings-container {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+#separator .ring {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 50%;
+    position: absolute;
+}
+
+#separator .ring-1 { width: 300px; height: 300px; }
+#separator .ring-2 { width: 400px; height: 400px; }
+#separator .ring-3 { width: 550px; height: 550px; }
+
+#separator .card-separator {
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 2rem;
+    max-width: 650px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 0 25px rgba(255,255,255,0.08);
+    position: relative;
+    z-index: 10;
+}
+
+
+/* ==========================================================
+   HEADER DO CARD / STATUS
+   ========================================================== */
+
+#separator .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#separator .status-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#separator .status-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+#separator .status-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    animation: pulseGreen 1.3s ease-in-out infinite;
+}
+
+@keyframes pulseGreen {
+    0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.5); }
+    100% { box-shadow: 0 0 8px 3px rgba(76,175,80,0.15); }
+}
+
+#separator .divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+}
+
+/* ==========================================================
+   INPUTS / PATH ROWS
+   ========================================================== */
+
+#separator .row {
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+#separator .input-path {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+#separator .input-path::placeholder {
+    color: rgba(255,255,255,0.4);
+}
+
+#separator .btn-select {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.25s ease;
+}
+
+#separator .btn-select:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* ==========================================================
+   BOTÃO PRINCIPAL
+   ========================================================== */
+
+#separator .actions-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+#separator .btn-convert {
+    padding: 0.8rem 1.4rem;
+    border-radius: 10px;
+    border: none;
+    background: #ffffff;
+    color: #000000;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+#separator .btn-convert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 12px rgba(255,255,255,0.3);
+}
+
+/* ==========================================================
+   BARRA DE PROGRESSO
+   ========================================================== */
+
+#separator .progress-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+#separator .sep-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+#separator .progress-fill-separator {
+    width: 0%;
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.25s ease;
+}
+
+#separator .progress-info {
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    color: rgba(255,255,255,0.75);
+}

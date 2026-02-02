@@ -23,3 +23,50 @@ Token expirado
 Usuário não encontrado
 
 Se você quiser, podemos rodar esse teste juntinho com os outros E2E (activation e tampered token) pra garantir que todo o sistema de autenticação está 100% coberto.
+
+src/
+├─ main.tsx
+├─ App.tsx
+├─ pages/
+│  ├─ Login.tsx
+│  ├─ Register.tsx
+│  ├─ Token.tsx
+│  ├─ Dashboard.tsx
+│  ├─ Features.tsx
+│  ├─ Contact.tsx
+│  ├─ XmlConverter.tsx
+│  ├─ Rename.tsx
+│  └─ Separator.tsx
+├─ components/
+│  ├─ Header.tsx
+│  ├─ Button.tsx
+│  └─ ProgressBar.tsx
+├─ styles/
+│  └─ global.css
+└─ assets/
+
+✅ SPA moderna (React)
+
+Uma única página (index.html)
+
+Várias rotas
+
+Cada rota → um componente React
+
+Quem controla a navegação:
+👉 React Router
+
+🧨 Regra de OURO pra você guardar
+
+Quando tudo fica preto ou some do nada no React + Vite:
+
+👉 é CSS
+👉 ou HMR bugando
+👉 ou display: none / position / z-index
+
+Situação	Use
+Menu / Header	✅ NavLink
+Botão que leva pra outra página	✅ Link
+Card clicável	✅ Link
+Destacar página atual	✅ NavLink
+CTA / ação visual	✅ Link

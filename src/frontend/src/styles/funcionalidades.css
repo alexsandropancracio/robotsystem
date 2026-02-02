@@ -1,0 +1,176 @@
+/* =======================
+FUNCIONALIDADES
+======================= */
+
+#funcionalidades {
+  min-height: 100vh;
+  background: #050505;
+  color: #fff;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+
+}
+
+/* ===== CONTAINER GERAL ===== */
+#funcionalidades .funcionalidades-container {
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+}
+
+/* ===== MAIN CONTENT ===== */
+#funcionalidades .main-content {
+  padding-top: 3rem;
+  padding-bottom: 4rem;
+  width: 100%;
+  transform: translateY(30px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== TITULOS ===== */
+#funcionalidades .section-header {
+  text-align: center;
+  max-width: 750px;
+  margin: 0 auto 3rem;
+}
+
+#funcionalidades .section-header h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+/* ===== GRID DOS CARDS ===== */
+#funcionalidades .cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  width: 100%;
+  padding: 0 1.2rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  #funcionalidades .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  #funcionalidades .cards-grid {
+    grid-template-columns: repeat(3, minmax(320px, 1fr));
+    gap: 2.5rem;
+  }
+}
+
+/* ===== CARD ===== */
+#funcionalidades .card {
+  background: rgba(255,255,255,0.04);
+  padding: 2rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: transform .25s ease, box-shadow .25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: 300px;
+  justify-content: flex-start;
+}
+
+#funcionalidades .card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 0 24px rgba(255,255,255,0.10);
+}
+
+/* ===== HEADER DO CARD ===== */
+#funcionalidades .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Ícone + texto lado a lado */
+#funcionalidades .status-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#funcionalidades .status-left p {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+#funcionalidades .status-left span {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* ======== CARD BODY ======== */
+#funcionalidades .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  gap: 10px;
+  padding: 12px 0;
+}
+
+/* Primeiro parágrafo (título interno) */
+#funcionalidades .card-body p:first-child {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+/* Texto descritivo */
+#funcionalidades .card-body p:nth-child(2) {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.4rem;
+}
+
+/* ======== FOOTER DO CARD ======== */
+#funcionalidades .card-body .card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+#funcionalidades .card-body .card-footer span {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.85);
+}
+
+/* Botão "Automatizar" */
+#funcionalidades .btn-automatizar {
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: rgb(255, 255, 255);
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+#funcionalidades .btn-automatizar:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: scale(1.03);
+}

@@ -65,4 +65,3 @@ CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 #pytest src/backend/tests `
   #--cov=src/backend/api `
   #--cov-report=term-missing
-

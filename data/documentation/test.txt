@@ -1,1 +1,45 @@
 
+
+
+ARQUITETURA FRONTEND:
+
+robotsystem/
+├── app/                       # Camada de aplicação e API interna
+│   ├── api.py                 # API principal exposta ao frontend
+│   ├── api_services.py        # Ponte entre API e serviços de negócio
+│   ├── api_window.py          # Integração com PyWebView (JS ↔ Python)
+│   ├── api_webview.py         # Inicialização da bridge webview
+│   ├── auth.py                # Autenticação e controle de acesso
+│   ├── interface.py           # Orquestração da interface desktop
+│   ├── logging_config.py      # Logs centralizados da aplicação
+│   ├── service.py             # Base de serviços da aplicação
+│   ├── user.py                # Modelo e lógica de usuário
+│   └── utils.py               # Utilitários compartilhados
+│
+├── services/                  # Camada de regras de negócio
+│   ├── converter.py           # Conversão de XML para CSV / Excel
+│   ├── separator.py           # Separação inteligente de documentos
+│   ├── rename.py              # Renomeação automática por filtro
+│   └── __init__.py
+│
+├── ui/                        # Camada de interface (Frontend)
+│   ├── index.html             # Estrutura base da UI
+│   ├── style.css              # Estilo e identidade visual
+│   ├── api.js                 # Comunicação JS ↔ API Python
+│   ├── actions.js             # Ações do usuário
+│   ├── auth.js                # Fluxos de autenticação
+│   ├── navigation.js          # Navegação entre telas
+│   ├── progress.js            # Feedback de progresso em tempo real
+│   └── storage.js             # Gerenciamento de estado local
+│
+└── main.py                    # Ponto de entrada da aplicação
+
+
+
+
+
+
+
+
+
+

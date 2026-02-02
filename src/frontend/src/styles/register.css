@@ -1,0 +1,119 @@
+#cadastro .cadastro-wrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 120px;
+    gap: 25px;
+    transform: translateY(-90px);
+    z-index: 9998;
+}
+
+/* Logo */
+#cadastro .cadastro-logo {
+    margin-bottom: 10px;
+}
+
+#cadastro .logo-text {
+    font-size: 50px;
+    text-align: center;
+    color: white;
+}
+
+#cadastro .cadastro-logo h2.logo-text {
+    font-size: 50px;
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+}
+
+/* CARD */
+#cadastro .cadastro-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 12px;
+    padding: 35px;
+    width: 420px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+/* Form */
+#cadastro .cadastro-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Labels -> agora com .label */
+#cadastro .label {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Inputs -> agora com .input */
+#cadastro .input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: white;
+    font-size: 1rem;
+}
+
+#cadastro .input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Botões */
+#cadastro .cadastro-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+#cadastro .btn-cadastrar,
+#cadastro .btn-cancelar {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid rgba(255,255,255,0.10);
+}
+
+#cadastro .btn-cadastrar {
+    background: white;
+    color: black;
+}
+
+#cadastro .btn-cadastrar:hover {
+    background: rgba(255,255,255,0.85);
+}
+
+#cadastro .btn-cancelar {
+    background: rgba(255,255,255,0.10);
+    color: white;
+}
+
+#cadastro .btn-cancelar:hover {
+    background: rgba(255,255,255,0.20);
+}
+
+/* Input transitions */
+#cadastro .input {
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    outline: none;
+}
+
+#cadastro .input:focus,
+#cadastro .input:focus-visible {
+    border-color: rgba(255,255,255,1);
+    box-shadow: 0 0 0 5px rgba(255,255,255,0.1);
+}
