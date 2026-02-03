@@ -1,3 +1,5 @@
+print("🔥 RENOMEAR_POR_FILTRO — ARQUIVO CARREGADO 🔥")
+
 import os
 import re
 import shutil

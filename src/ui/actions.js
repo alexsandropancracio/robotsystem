@@ -1,5 +1,5 @@
 import { resetProgressBars } from './progress.js';
-// actions.js
+// ui/actions.js
 
 console.log("🚀 [ACTIONS] Módulo actions carregado");
 

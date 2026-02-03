@@ -1,4 +1,4 @@
-// api.js
+// ui/api.js
 console.log("[API] módulo carregado");
 
 export async function converterXML(src, dst, fmt) {

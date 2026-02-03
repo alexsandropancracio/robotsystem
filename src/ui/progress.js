@@ -1,4 +1,4 @@
-// progress.js
+// ui/progress.js
 console.log("[PROGRESS] Módulo progress carregado");
 
 // 🔥 Estas funções ficam globais (acessíveis pelo PyWebView)

@@ -9,27 +9,30 @@ def init(window):
     window.maximize()
     logger.info("🪟 Janela iniciada e maximizada")
 
-
 def main():
-    # Caminho da interface
-    html_path = Path(__file__).parent / "ui" / "index.html"
+    BASE_DIR = Path(__file__).resolve().parent
+
+    # Caminho absoluto para o build do React
+    html_path = (BASE_DIR / "frontend" / "dist" / "index.html").resolve()
+    logger.info(f"HTML PATH: {html_path}")
+    print("HTML EXISTS:", html_path.exists())
+
+    print(html_path)
+    print(html_path.exists())
+
     if not html_path.exists():
         logger.error(f"[ERRO] HTML não encontrado: {html_path}")
         return
 
-    logger.debug(f"📄 HTML carregado em: {html_path}")
-
-    # Instancia as APIs (por enquanto sem janela)
+    # Instancia APIs
     window_api = WindowAPI(None)
     services_api = ServicesAPI(None)
-
-    # Instancia o agrupador de APIs
     api = API(None, window_api, services_api)
 
-    # Cria a janela com a API conectada
+    # Cria a janela PyWebView
     window = webview.create_window(
         "robotsystem",
-        str(html_path),
+        str(html_path) + "#/interface",
         width=1200,
         height=700,
         resizable=True,
@@ -37,7 +40,7 @@ def main():
         js_api=api
     )
 
-    # 🔁 Injeta a janela nas APIs (depois de criada)
+    # Injeta a janela nas APIs
     api.window = window
     window_api.window = window
     services_api.window = window
@@ -50,7 +53,6 @@ def main():
         args=(window,),
         gui='edgechromium',
         debug=True,
-        http_server=True
     )
 
 if __name__ == "__main__":

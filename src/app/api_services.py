@@ -7,14 +7,17 @@ from services.rename import renomear_por_filtro
 from app.auth import get_auth_service
 from app.logging_config import logger
 
+
 class ServicesAPI:
     def __init__(self, window):
         self.window = window
-        self.db = get_auth_service()  # já instancia AuthService
+        self.db = get_auth_service()
         logger.info("AuthService inicializado")
 
-        # >>> LOG PRA CONFERIR MÉTODOS EXPOS
-        metodos = [func for func in dir(self) if callable(getattr(self, func)) and not func.startswith("_")]
+        metodos = [
+            func for func in dir(self)
+            if callable(getattr(self, func)) and not func.startswith("_")
+        ]
         logger.info("🌐 Métodos disponíveis na API: %s", metodos)
 
     # ==================
@@ -33,12 +36,12 @@ class ServicesAPI:
             pasta = pasta[0]
             pasta_escaped = pasta.replace("\\", "\\\\")
             js = f"window.onPastaSelecionada('{campo}', '{pasta_escaped}')"
-            
+
             logger.info(f"📁 Pasta selecionada: {pasta}")
             logger.debug(f"➡️ JS enviado: {js}")
 
             try:
-                self.window.evaluate_js(js)  # Se preferir manter, ok
+                self.window.evaluate_js(js)
             except Exception as e:
                 logger.error(f"🔴 Falha ao enviar JS: {e}")
                 return False
@@ -51,14 +54,11 @@ class ServicesAPI:
     # CONVERTENDO XML -> CSV/EXCEL
     # =============================
     def converter_xml(self, caminho_entrada: str, caminho_saida: str, formato: str = "csv"):
-        logger.info("[DEBUG] Iniciando converter_xml")
-        logger.info("[DEBUG] entrada=%s, saida=%s, formato=%s", caminho_entrada, caminho_saida, formato)
+        logger.info("[XML] Iniciando conversão")
 
-        # Normaliza formato
         formato = (formato or "").strip().lower()
         fmt = "excel" if formato in ("excel", "xlsx", ".xlsx") else "csv"
 
-        # Validações
         if not os.path.isdir(caminho_entrada):
             return {
                 "status": "erro",
@@ -78,17 +78,17 @@ class ServicesAPI:
                 "arquivos_processados": 0
             }
 
-        # 🔵 progresso REAL vindo do serviço
         def atualizar_progresso(pct: int):
             try:
                 if self.window:
-                    self.window.evaluate_js(f"window.atualizarProgressoXML({pct});")
-                logger.info(f"[PROGRESS] {pct}%")
+                    self.window.evaluate_js(
+                        f"window.atualizarProgresso('xml-progress', {pct});"
+                    )
+                logger.info(f"[XML][PROGRESS] {pct}%")
             except Exception as e:
-                logger.error("[ERRO] Falha ao enviar progresso: %s", e)
+                logger.error("[XML] Erro ao enviar progresso: %s", e)
 
         try:
-            # 🔥 UMA ÚNICA CHAMADA
             resultado = converter_func(
                 pasta_entrada=caminho_entrada,
                 pasta_saida=caminho_saida,
@@ -105,7 +105,7 @@ class ServicesAPI:
             }
 
         except Exception as e:
-            logger.exception("[ERRO] Falha geral na conversão")
+            logger.exception("[XML] Falha geral")
             return {
                 "status": "erro",
                 "mensagem": str(e),
@@ -116,95 +116,54 @@ class ServicesAPI:
     # RENOMEADOR DE DOCUMENTOS POR FILTRO
     # ====================================
     def renomear_arquivos(self, pasta_origem: str, pasta_destino: str, filtro: str):
-        logger.info(f"[RENOMEAÇÃO] Iniciado com filtro='{filtro}'")
-        logger.info(f"📂 Origem: {pasta_origem}")
-        logger.info(f"📁 Destino: {pasta_destino}")
+        logger.info(f"[RENAME] Iniciado | filtro='{filtro}'")
 
-        # ==== Validações iniciais ====
         if not filtro or not filtro.strip():
-            return {
-                "status": "erro",
-                "message": "Filtro inválido",
-                "arquivos_processados": 0
-            }
+            return {"status": "erro", "message": "Filtro inválido", "arquivos_processados": 0}
 
         if not os.path.isdir(pasta_origem):
-            return {
-                "status": "erro",
-                "message": "Pasta de origem inválida",
-                "arquivos_processados": 0
-            }
+            return {"status": "erro", "message": "Pasta de origem inválida", "arquivos_processados": 0}
 
         if not os.path.isdir(pasta_destino):
-            return {
-                "status": "erro",
-                "message": "Pasta de destino inválida",
-                "arquivos_processados": 0
-            }
+            return {"status": "erro", "message": "Pasta de destino inválida", "arquivos_processados": 0}
 
-        # ==== Lista de arquivos ====
-        arquivos = [
-            f for f in os.listdir(pasta_origem)
-            if os.path.isfile(os.path.join(pasta_origem, f))
-        ]
-
-        total = len(arquivos)
-
-        if total == 0:
-            return {
-                "status": "erro",
-                "message": "Nenhum arquivo encontrado para renomear",
-                "arquivos_processados": 0
-            }
-
-        # ==== Atualização de progresso ====
         def atualizar_progresso(pct: int):
             try:
                 if self.window:
                     self.window.evaluate_js(
-                        f"window.atualizarProgressoRename({pct});"
+                        f"window.atualizarProgresso('rename-progress', {pct});"
                     )
-                logger.info(f"[RENOMEAÇÃO][PROGRESS] {pct}%")
+                logger.info(f"[RENAME][PROGRESS] {pct}%")
             except Exception as e:
-                logger.error(f"[RENOMEAÇÃO] Erro ao atualizar progresso: {e}")
+                logger.error("[RENAME] Erro ao atualizar progresso: %s", e)
 
-        # ==== Loop controlado pela API ====
-        processados = 0
+        try:
+            total_renomeados = renomear_por_filtro(
+                pasta_entrada=pasta_origem,
+                pasta_saida=pasta_destino,
+                filtro=filtro.lower(),
+                progress_signal=atualizar_progresso
+            )
 
-        for i, arquivo in enumerate(arquivos, start=1):
-            caminho_arquivo = os.path.join(pasta_origem, arquivo)
+            return {
+                "status": "ok",
+                "message": "Renomeação concluída",
+                "arquivos_processados": total_renomeados
+            }
 
-            try:
-                renomear_por_filtro(
-                    arquivo=caminho_arquivo,
-                    pasta_saida=pasta_destino,
-                    filtro=filtro.lower()
-                )
-                processados += 1
-            except Exception as e:
-                logger.error(f"[RENOMEAÇÃO] Erro ao renomear '{arquivo}': {e}")
+        except Exception as e:
+            logger.exception("[RENAME] Erro inesperado")
+            return {
+                "status": "erro",
+                "message": str(e),
+                "arquivos_processados": 0
+            }
 
-            # 🎯 ===== progresso calculado aqui ====
-            pct = int((i / total) * 100)
-            atualizar_progresso(pct)
-
-        # ==== Retorno padronizado ====
-        logger.info(
-            f"[RENOMEAÇÃO] Finalizado | {processados}/{total} arquivos processados"
-        )
-
-        return {
-            "status": "ok",
-            "message": f"Renomeação concluída ({processados} arquivos)",
-            "arquivos_processados": processados
-        }
-
-    
-        # ==============================
-        # SEPARAR DOCUMENTOS POR TERMOS
-        # ==============================
+    # ==============================
+    # SEPARAR DOCUMENTOS POR TERMOS
+    # ==============================
     def separar_documentos(self, parametro: str, pasta_origem: str, pasta_destino: str):
-        logger.info(f"[SEPARADOR] Iniciando | termo='{parametro}'")
+        logger.info(f"[SEPARATOR] Iniciando | termo='{parametro}'")
 
         try:
             gerador = separar_documentos_por_termos(
@@ -216,20 +175,19 @@ class ServicesAPI:
             resultado_final = None
 
             for evento in gerador:
-
                 if evento["tipo"] == "progresso":
                     pct = evento["progresso"]
 
                     if self.window:
                         self.window.evaluate_js(
-                            f"window.atualizarProgressoSeparator({pct});"
+                            f"window.atualizarProgresso('separator-progress', {pct});"
                         )
 
-                    logger.info(f"[SEPARADOR][{pct}%]")
+                    logger.info(f"[SEPARATOR][PROGRESS] {pct}%")
 
                 elif evento["tipo"] == "erro":
                     logger.error(
-                        f"[SEPARADOR] Erro em {evento['arquivo']}: {evento['erro']}"
+                        f"[SEPARATOR] Erro em {evento['arquivo']}: {evento['erro']}"
                     )
 
                 elif evento["tipo"] == "final":
@@ -242,7 +200,7 @@ class ServicesAPI:
             }
 
         except Exception as e:
-            logger.exception("[SEPARADOR] Falha geral")
+            logger.exception("[SEPARATOR] Falha geral")
             return {
                 "status": "erro",
                 "message": str(e)
