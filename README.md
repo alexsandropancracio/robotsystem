@@ -1,125 +1,186 @@
 # robotsystem
 
-Software desktop desenvolvido para **ambiente corporativo**, com foco na **automação de tarefas operacionais repetitivas envolvendo arquivos e documentos**.
-
-O projeto foi criado com o objetivo de reduzir tempo manual, minimizar erros humanos e aumentar a produtividade em rotinas administrativas.
+Sistema desktop web-integrado para **automação, organização e processamento inteligente de documentos PDF e XML**, desenvolvido com foco em produtividade, escalabilidade e integração fullstack.
 
 ---
 
-# 🎯 Objetivo do Projeto
+## 📌 Sobre o Projeto
 
-Empresas lidam diariamente com:
+O **RobotSystem** surgiu a partir de uma necessidade real dentro de empresa, onde tarefas manuais de organização de documentos consumiam muito tempo e eram altamente repetitivas.
 
-- Separação manual de documentos  
-- Organização e padronização de arquivos  
-- Renomeação baseada em dados como CPF/CNPJ  
-- Processos repetitivos que consomem horas da equipe  
+Atividades como:
 
-Este software foi desenvolvido para **automatizar esses fluxos**, trazendo:
+- Separar documentos personalizados  
+- Renomear arquivos por Nome, CPF ou CNPJ  
+- Converter XML em planilhas  
+- Organizar grandes volumes de PDFs  
 
-- ⚡ Agilidade operacional  
-- 🔒 Segurança  
-- 📈 Escalabilidade  
-- 🏢 Estrutura preparada para ambiente corporativo  
+Eram feitas manualmente.
 
----
+A partir disso surgiu a ideia:
 
-# ⚙️ Funcionalidades
+> “Se eu já automatizo tarefas com scripts, por que não desenvolver um software completo?”
 
-## 📁 1. Separação de Documentos
-
-Permite:
-
-- Selecionar pasta de origem  
-- Selecionar pasta de destino  
-- Definir parâmetros de separação  
-- Executar processamento com barra de progresso em tempo real  
-
-Ideal para rotinas onde múltiplos documentos precisam ser organizados automaticamente.
+O que começou como scripts em Python evoluiu para um **sistema fullstack robusto**, com interface moderna, back-end estruturado e integração inteligente com processamento de documentos.
 
 ---
 
-## 🏷️ 2. Renomeação Inteligente de Arquivos
+## 🚀 Funcionalidades
 
-Sistema de renomeação com filtros:
-
-- Nome  
-- CPF  
-- CNPJ  
-
-Inclui:
-
-- Confirmação antes da execução  
-- Exibição da quantidade de arquivos processados  
-- Barra de progresso dinâmica  
-
-Voltado para padronização e organização automatizada de arquivos empresariais.
+### 📂 Separação de Documentos
+- Processamento automatizado de PDFs  
+- Organização baseada em critérios definidos  
+- Barra de progresso em tempo real  
 
 ---
 
-## 🔐 3. Estrutura Completa de Autenticação (Backend)
-
-O sistema já possui backend estruturado com:
-
-- Cadastro de usuários  
-- Login  
-- Logout  
-- Estrutura de autenticação  
-- Controle de segurança  
-- Banco de dados configurado  
-
-Os endpoints já estão implementados — faltando apenas a integração final com o frontend.
+### 🏷️ Renomeação Inteligente de PDFs
+- Extração automática de:
+  - Nome  
+  - CPF  
+  - CNPJ  
+- Leitura via:
+  - Texto nativo do PDF  
+  - OCR (fallback para PDFs escaneados)  
+- Normalização e sanitização de nomes de arquivo  
+- Substituição segura sem conflitos  
 
 ---
 
-# 🧠 Arquitetura do Projeto
-
-O projeto foi desenvolvido com separação clara entre frontend e backend, seguindo boas práticas de arquitetura.
+### 📊 Conversão de XML
+- Conversão de XML para:
+  - CSV  
+  - Excel  
+- Estrutura pronta para análise e relatórios  
 
 ---
 
-## 🖥️ Frontend (Desktop Application)
+### 🔄 Progresso em Tempo Real
+- Comunicação entre front-end e back-end via eventos customizados  
+- Atualização dinâmica da barra de progresso  
+
+---
+
+## 🏗️ Arquitetura do Projeto
+
+### 🔹 Backend
+
+Desenvolvido em **Python + FastAPI**, com separação clara de responsabilidades:
+
+- routes
+- schemas
+- services
+- repositories
+- models
+- core
+
+
+Principais características:
+
+- Arquitetura em camadas (Clean-ish)  
+- Regras de negócio desacopladas da camada HTTP  
+- ORM com SQLAlchemy  
+- Validação com Pydantic  
+- Tratamento robusto de erros  
+- Processamento de arquivos com:
+  - PyMuPDF  
+  - Tesseract OCR  
+  - Expressões Regulares avançadas  
+
+---
+
+### 🔹 Frontend
+
+Inicialmente desenvolvido com **HTML5 + JavaScript Vanilla**.  
+Posteriormente migrado para uma stack moderna:
 
 - React  
 - TypeScript  
 - Vite  
-- Interface moderna e componentizada  
-- Modais customizados (UX profissional)  
-- Comunicação com backend via PyWebView  
+
+Principais características:
+
+- Componentização  
+- Gerenciamento de estado com `useState`  
+- Efeitos com `useEffect`  
+- Integração com back-end via PyWebView  
+- CSS organizado por escopo de componente  
+- Interface responsiva com foco em UX  
 
 ---
 
-## 🐍 Backend (API Corporativa)
+## 🔐 Segurança
 
+- Hashing de senhas com **Argon2 + PEPPER**  
+- Criptografia **AES-256**  
+- Sanitização de dados para evitar falhas no sistema de arquivos  
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+### 👨‍💻 Linguagens
 - Python  
+- JavaScript  
+- TypeScript  
+
+### ⚙️ Backend
+- FastAPI  
 - SQLAlchemy  
-- Alembic (controle de migrations)  
+- Pydantic  
+- PyWebView  
+
+### 🎨 Frontend
+- React  
+- Vite  
+- HTML5  
+- CSS3  
+
+### 🗄️ Banco de Dados
 - PostgreSQL  
-- Estrutura pronta para autenticação e controle de usuários  
+- SQLite  
 
----
+### 📄 Processamento de Arquivos
+- PyMuPDF  
+- Tesseract OCR  
+- Pillow  
 
-# 🐳 Ambiente Containerizado
-
-O backend roda totalmente containerizado com:
-
+### 🐳 Infraestrutura
 - Docker  
 - Docker Compose  
-- Banco PostgreSQL isolado  
-- Migrations versionadas  
-- Ambiente preparado para deploy escalável  
+- Git  
+- GitHub  
 
 ---
 
-# 🧪 Qualidade e Testes
+## 🧠 Processo de Evolução
 
-O backend já possui:
+O projeto passou por múltiplas reconstruções:
 
-- ✅ Testes Unitários  
-- ✅ Testes End-to-End (E2E)  
-- ✅ Estrutura preparada para manutenção e crescimento  
+1. Primeira versão em JavaScript Vanilla  
+2. Projeto corrompido → reconstrução completa  
+3. Evolução do back-end para API estruturada  
+4. Migração total do front-end para React + TypeScript  
+5. Integração completa entre camadas  
+
+Esse processo consolidou:
+
+- Entendimento profundo de arquitetura  
+- Leitura e organização de fluxo entre arquivos  
+- Estruturação escalável  
+- Resiliência técnica  
 
 ---
+
+## 🎯 Objetivo
+
+O RobotSystem foi desenvolvido para:
+
+- Reduzir tempo operacional  
+- Diminuir erros humanos  
+- Automatizar tarefas repetitivas  
+- Estruturar processos internos  
+- Servir como base para futura evolução para SaaS  
 
 # 🚀 Status Atual
 
@@ -185,4 +246,12 @@ Este não é apenas um sistema de manipulação de arquivos.
 - Arquitetura pronta para escalar  
 
 O projeto representa a construção de uma solução real para ambientes empresariais que demandam automação, segurança e organização.
+
+## 👨‍💻 Autor
+
+**Alexsandro Pancracio**
+
+Desenvolvedor focado em automação, IA, arquitetura de sistemas e integração fullstack.
+
+Este projeto representa uma evolução prática intensa, construída com estudo, persistência e aplicação real.
 
