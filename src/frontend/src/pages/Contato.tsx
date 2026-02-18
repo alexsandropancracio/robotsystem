@@ -38,7 +38,7 @@ export default function Contato() {
                   <span className="material-symbols-outlined icon">phone</span>
                   <div className="info-text">
                     <div className="info-title">Celular</div>
-                    <div className="info-value">(11) 95619-7970</div>
+                    <div className="info-value">(00) 00000-0000</div>
                   </div>
                 </div>
 
