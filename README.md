@@ -193,32 +193,6 @@ O RobotSystem foi desenvolvido para:
 
 ---
 
-# 🏗️ Stack Completa
-
-## Frontend
-- React  
-- TypeScript  
-- Vite  
-
-## Desktop Bridge
-- PyWebView  
-
-## Backend
-- Python  
-- SQLAlchemy  
-- Alembic  
-- PostgreSQL  
-
-## Infraestrutura
-- Docker  
-- Docker Compose  
-
-## Testes
-- Pytest  
-- Testes E2E  
-
----
-
 # 💡 Visão de Produto
 
 Este projeto foi pensado como base para um software corporativo de automação, podendo evoluir para:
