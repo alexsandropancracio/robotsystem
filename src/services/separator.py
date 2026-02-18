@@ -5,7 +5,6 @@ from PyPDF2 import PdfReader
 from unidecode import unidecode
 import math
 
-
 def separar_documentos_por_termos(
     pasta_entrada: str,
     pasta_saida: str,

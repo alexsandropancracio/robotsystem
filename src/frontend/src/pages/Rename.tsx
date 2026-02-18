@@ -6,6 +6,8 @@ import {
   renomearArquivos,
 } from "../services/pywebview.service"
 
+import Modal from "../components/Modal"
+
 type RenameResult = {
   status: string
   message?: string
@@ -19,6 +21,9 @@ const Rename = () => {
   const [filtro, setFiltro] = useState("nome")
   const [progress, setProgress] = useState(0)
   const [loading, setLoading] = useState(false)
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalConfig, setModalConfig] = useState<any>(null)
 
   // =====================================
   // ESCUTA GLOBAL DE PROGRESSO
@@ -51,6 +56,18 @@ const Rename = () => {
   }, [])
 
   // =====================================
+  // MODAL HELPERS
+  // =====================================
+  const showModal = (config: any) => {
+    setModalConfig(config)
+    setModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setModalOpen(false)
+  }
+
+  // =====================================
   // SELECIONAR PASTA
   // =====================================
   const handleSelecionarPasta = async (
@@ -60,19 +77,19 @@ const Rename = () => {
       await selecionarPasta(campo)
     } catch (error) {
       console.error("[RENAME] selecionarPasta:", error)
-      alert("❌ Erro ao selecionar pasta.")
+
+      showModal({
+        title: "Erro",
+        message: "Erro ao selecionar pasta.",
+        onConfirm: closeModal,
+      })
     }
   }
 
   // =====================================
-  // INICIAR RENOMEAÇÃO
+  // EXECUTAR RENOMEAÇÃO
   // =====================================
-  const handleRename = async () => {
-    if (!sourcePath || !targetPath) {
-      alert("⚠️ Selecione as pastas antes de iniciar.")
-      return
-    }
-
+  const executarRenomeacao = async () => {
     try {
       setLoading(true)
       setProgress(0)
@@ -89,122 +106,170 @@ const Rename = () => {
           resultado.arquivosProcessados ??
           0
 
-        alert(`✔️ Renomeação concluída: ${total} arquivos processados`)
+        showModal({
+          title: "Concluído",
+          message: `Renomeação concluída com sucesso!\n\n${total} arquivos processados.`,
+          onConfirm: closeModal,
+        })
       } else {
-        alert(`❌ Erro: ${resultado.message ?? "Erro desconhecido"}`)
+        showModal({
+          title: "Erro",
+          message: resultado.message ?? "Erro desconhecido.",
+          onConfirm: closeModal,
+        })
       }
     } catch (error) {
       console.error("[RENAME] Erro geral:", error)
-      alert("❌ Erro inesperado ao renomear arquivos.")
+
+      showModal({
+        title: "Erro",
+        message: "Erro inesperado ao renomear arquivos.",
+        onConfirm: closeModal,
+      })
     } finally {
       setLoading(false)
     }
+  }
+
+  // =====================================
+  // INICIAR PROCESSO
+  // =====================================
+  const handleRename = () => {
+    if (!sourcePath || !targetPath) {
+      showModal({
+        title: "Atenção",
+        message: "Selecione as duas pastas antes de iniciar.",
+        onConfirm: closeModal,
+      })
+      return
+    }
+
+    showModal({
+      title: "Confirmar Renomeação",
+      message: `Deseja iniciar a renomeação com as seguintes configurações?\n\n📁 Origem: ${sourcePath}\n📁 Destino: ${targetPath}\n🔎 Filtro: ${filtro.toUpperCase()}`,
+      onConfirm: async () => {
+        closeModal()
+        await executarRenomeacao()
+      },
+      onCancel: closeModal,
+    })
   }
 
   // =========================
   // RENDER
   // =========================
   return (
-    <section id="rename">
-      <div className="rename-container">
-        <main className="rename-main">
-          <div className="rename-center">
+    <>
+      <section id="rename">
+        <div className="rename-container">
+          <main className="rename-main">
+            <div className="rename-center">
 
-            <h1 className="rename-title">
-              Renomeie Arquivos com Filtros
-            </h1>
+              <h1 className="rename-title">
+                Renomeie Arquivos com Filtros
+              </h1>
 
-            <p className="rename-sub">
-              Escolha as pastas, defina o filtro e clique em Iniciar.
-            </p>
+              <p className="rename-sub">
+                Escolha as pastas, defina o filtro e clique em Iniciar.
+              </p>
 
-            <div className="card-wrapper-rename">
-              <article className="card-rename">
-                <div className="card-content">
+              <div className="card-wrapper-rename">
+                <article className="card-rename">
+                  <div className="card-content">
 
-                  {/* PASTA ORIGEM */}
-                  <div className="row">
-                    <input
-                      className="input-path"
-                      placeholder="Caminho da pasta de entrada"
-                      value={sourcePath}
-                      readOnly
-                    />
-                    <button
-                      className="btn-select"
-                      onClick={() => handleSelecionarPasta("source")}
-                    >
-                      Selecionar
-                    </button>
-                  </div>
-
-                  {/* PASTA DESTINO */}
-                  <div className="row">
-                    <input
-                      className="input-path"
-                      placeholder="Caminho da pasta de saída"
-                      value={targetPath}
-                      readOnly
-                    />
-                    <button
-                      className="btn-select"
-                      onClick={() => handleSelecionarPasta("target")}
-                    >
-                      Selecionar
-                    </button>
-                  </div>
-
-                  {/* AÇÕES (IGUAL AO XML CONVERTER) */}
-                  <div className="position-action">
-                    <div className="format-filter">
-                      <label>Formato de pesquisa:</label>
-                      <select
-                        className="select-doc"
-                        value={filtro}
-                        onChange={(e) =>
-                          setFiltro(e.target.value)
-                        }
-                      >
-                        <option value="nome">Nome</option>
-                        <option value="cpf">CPF</option>
-                        <option value="cnpj">CNPJ</option>
-                      </select>
-                    </div>
-
-                    <div className="actions-row">
+                    {/* ORIGEM */}
+                    <div className="row">
+                      <input
+                        className="input-path"
+                        placeholder="Caminho da pasta de entrada"
+                        value={sourcePath}
+                        readOnly
+                      />
                       <button
-                        className="btn-convert"
-                        onClick={handleRename}
-                        disabled={loading}
+                        className="btn-select"
+                        onClick={() => handleSelecionarPasta("source")}
                       >
-                        {loading ? "Processando..." : "Iniciar"}
+                        Selecionar
                       </button>
                     </div>
-                  </div>
 
-                  {/* PROGRESSO */}
-                  <div className="progress-block">
-                    <div className="rename-progress-bar">
-                      <div
-                        className="progress-fill-rename"
-                        style={{ width: `${progress}%` }}
+                    {/* DESTINO */}
+                    <div className="row">
+                      <input
+                        className="input-path"
+                        placeholder="Caminho da pasta de saída"
+                        value={targetPath}
+                        readOnly
                       />
+                      <button
+                        className="btn-select"
+                        onClick={() => handleSelecionarPasta("target")}
+                      >
+                        Selecionar
+                      </button>
                     </div>
-                    <div className="progress-info">
-                      <span className="progress-percent">
-                        {progress}%
-                      </span>
+
+                    {/* AÇÕES */}
+                    <div className="position-action">
+                      <div className="format-filter">
+                        <label>Formato de pesquisa:</label>
+                        <select
+                          className="select-doc"
+                          value={filtro}
+                          onChange={(e) =>
+                            setFiltro(e.target.value)
+                          }
+                        >
+                          <option value="nome">Nome</option>
+                          <option value="cpf">CPF</option>
+                          <option value="cnpj">CNPJ</option>
+                        </select>
+                      </div>
+
+                      <div className="actions-row">
+                        <button
+                          className="btn-convert"
+                          onClick={handleRename}
+                          disabled={loading}
+                        >
+                          {loading ? "Processando..." : "Iniciar"}
+                        </button>
+                      </div>
                     </div>
+
+                    {/* PROGRESSO */}
+                    <div className="progress-block">
+                      <div className="rename-progress-bar">
+                        <div
+                          className="progress-fill-rename"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      <div className="progress-info">
+                        <span className="progress-percent">
+                          {progress}%
+                        </span>
+                      </div>
+                    </div>
+
                   </div>
+                </article>
+              </div>
 
-                </div>
-              </article>
             </div>
+          </main>
+        </div>
+      </section>
 
-          </div>
-        </main>
-      </div>
-    </section>
+      {/* MODAL GLOBAL */}
+      <Modal
+        open={modalOpen}
+        title={modalConfig?.title}
+        message={modalConfig?.message}
+        onConfirm={modalConfig?.onConfirm}
+        onCancel={modalConfig?.onCancel}
+      />
+    </>
   )
 }
 

@@ -2,21 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
 
 from backend.api.deps.database import get_db
 from backend.api.schemas.user import UserLogin, Token
 from backend.api.schemas.auth import (
     ActivateAccountRequest,
     SendActivationRequest,
-    RefreshTokenRequest,
 )
 from backend.api.schemas.password_reset import (
     PasswordResetRequest,
     PasswordResetConfirm,
 )
 from backend.api.services.auth_service import login_service
-from backend.api.services.refresh_token_service import RefreshTokenService
+
 from backend.api.services.activation_token_service import ActivationTokenService
 from backend.api.repositories.user_repository import UserRepository
 from backend.api.core.auth import create_access_token
